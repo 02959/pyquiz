@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#4f46e5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="JC1001 Python 摸底测评：103 道选择/填空题，答完按章节给出薄弱点。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='45' font-size='31' font-family='Segoe UI,Arial,sans-serif' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EPy%3C/text%3E%3C/svg%3E">
+<title>Python 摸底测评 · JC1001</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:-apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;background:#f4f5fa;color:#1b2033;-webkit-font-smoothing:antialiased;line-height:1.6}
+code,pre,.mono{font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 90px}
+.hide{display:none!important}
+
+/* ---------- 顶部 ---------- */
+.hdr{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;display:grid;place-items:center;font-weight:800;font-size:17px;box-shadow:0 6px 16px rgba(79,70,229,.35);flex:none}
+.hdr h1{font-size:20px;margin:0;letter-spacing:.2px}
+.hdr p{margin:2px 0 0;color:#6b7280;font-size:13px}
+.hstat{margin-left:auto;font-size:12.5px;color:#6b7280;background:#fff;border:1px solid #e6e8f0;padding:8px 14px;border-radius:999px;white-space:nowrap}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:22px;padding:30px 32px;background:linear-gradient(120deg,#4338ca,#6d28d9 55%,#7c3aed);color:#fff;display:flex;gap:28px;align-items:center;box-shadow:0 18px 40px -18px rgba(76,29,149,.7);margin-bottom:18px}
+.hero::after{content:'';position:absolute;width:340px;height:340px;right:-110px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%);pointer-events:none}
+.hero h2{margin:0 0 8px;font-size:24px;letter-spacing:.3px}
+.hero p{margin:0;color:#ddd9ff;font-size:14px;max-width:580px}
+.hero-r{margin-left:auto;display:flex;gap:24px;text-align:center;flex:none;position:relative;z-index:1}
+.hero-r b{display:block;font-size:26px;line-height:1.15;font-variant-numeric:tabular-nums}
+.hero-r span{font-size:12px;color:#cfc9ff}
+.kbd-hint{margin-top:14px;font-size:12px;color:#cfc9ff}
+kbd{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-family:inherit;font-size:11px;margin:0 2px}
+
+/* ---------- 面板 ---------- */
+.panel{background:#fff;border:1px solid #e8eaf2;border-radius:18px;padding:20px 22px;margin-bottom:16px;box-shadow:0 2px 10px rgba(20,25,60,.03)}
+.panel-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.panel-h h3{margin:0;font-size:15px}
+.muted{color:#8a90a3;font-size:12.5px}
+.chips-ctrl{margin-left:auto;display:flex;gap:6px}
+.chips-ctrl button{border:1px solid #e6e8f2;background:#fff;color:#6b7280;font-size:12px;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit}
+.chips-ctrl button:hover{background:#f7f8ff;border-color:#c7cbf5;color:#4338ca}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #e2e5f0;background:#fafbff;color:#4b5268;border-radius:999px;padding:7px 13px;font-size:13px;cursor:pointer;transition:.15s;font-family:inherit}
+.chip i{font-style:normal;font-size:11px;color:#9aa0b4;background:#eef0f8;border-radius:999px;padding:0 6px;line-height:1.6}
+.chip:hover{border-color:#c7cbf5}
+.chip.on{background:#eef2ff;border-color:#a5b4fc;color:#3730a3}
+.chip.on i{background:#dbe3ff;color:#4338ca}
+
+.startrow{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:14px;border-radius:11px;padding:10px 18px;border:1px solid transparent;cursor:pointer;transition:.15s;font-weight:600;color:#fff;background:#4f46e5}
+.btn.primary{background:linear-gradient(135deg,#4f46e5,#6d28d9);box-shadow:0 6px 18px -6px rgba(79,70,229,.7)}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 9px 22px -8px rgba(79,70,229,.8)}
+.btn.ghost{background:#fff;border-color:#dfe3ef;color:#3d4358}
+.btn.ghost:hover{border-color:#b9c0d8;background:#fafbff}
+.btn.subtle{background:#f3f4f9;color:#5b6175;font-weight:500}
+.btn.subtle:hover{background:#eceef6}
+.btn.lg{padding:13px 26px;font-size:15px}
+.btn.small{padding:7px 13px;font-size:12.5px;font-weight:500}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important;box-shadow:none}
+.laststat{font-size:12.5px;color:#8a90a3;margin-left:4px}
+
+/* ---------- 恢复进度条 ---------- */
+.resume-bar{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,#eef2ff,#f5f3ff);border:1px solid #ddd6fe;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#4338ca;flex-wrap:wrap}
+.resume-bar b{font-variant-numeric:tabular-nums;color:#3730a3}
+.resume-bar .sp{flex:1}
+.resume-bar .btn{flex:none}
+
+/* ---------- 知识点地图 ---------- */
+.kcard{border:1px solid #eceef6;border-radius:14px;margin-bottom:10px;overflow:hidden;background:#fff;transition:.15s}
+.kcard[open]{border-color:#dcd9fb;box-shadow:0 6px 20px -14px rgba(79,70,229,.5)}
+.kcard summary{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;list-style:none;font-size:14px}
+.kcard summary::-webkit-details-marker{display:none}
+.cn{flex:none;font-size:11.5px;font-weight:700;color:#4f46e5;background:#eef2ff;border-radius:6px;padding:2px 7px}
+.kt{font-weight:600}
+.kc{margin-left:auto;font-size:11.5px;color:#9aa0b4}
+.chev{width:7px;height:7px;border-right:1.6px solid #a9afc3;border-bottom:1.6px solid #a9afc3;transform:rotate(45deg);transition:.2s;flex:none;margin-left:4px}
+.kcard[open] .chev{transform:rotate(-135deg);border-color:#6d6af0}
+.kbody{padding:0 16px 16px;border-top:1px dashed #eef0f7}
+.kbody ul{margin:12px 0;padding-left:20px;font-size:13.4px;color:#3f4559}
+.kbody li{margin:5px 0}
+.pit{background:#fff8ed;border-left:3px solid #f59e0b;color:#8a5a00;font-size:12.8px;padding:8px 12px;border-radius:0 8px 8px 0;margin:10px 0}
+.kbody .btn{margin-top:2px}
+
+/* ---------- 弹窗 ---------- */
+.overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(23,27,45,.55);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .18s}
+.overlay.show{opacity:1;pointer-events:auto}
+.modal{width:min(760px,100%);max-height:92vh;display:flex;flex-direction:column;background:#fff;border-radius:20px;box-shadow:0 30px 80px -20px rgba(10,12,30,.55);transform:translateY(10px) scale(.985);transition:transform .22s cubic-bezier(.2,.8,.3,1);overflow:hidden}
+.overlay.show .modal{transform:none}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-3px)}40%,60%{transform:translateX(3px)}}
+.shake{animation:shake .4s}
+
+.m-head{display:flex;align-items:center;padding:16px 18px 12px;gap:10px}
+.m-crumb{font-size:12.5px;color:#8a90a3;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.m-crumb b{color:#4f46e5;font-weight:700}
+.x{margin-left:auto;border:0;background:#f3f4f9;color:#7b8194;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:13px;flex:none}
+.x:hover{background:#e8eaf3;color:#3d4358}
+.pbar{height:4px;background:#eef0f7;margin:0 18px;border-radius:99px;overflow:hidden;flex:none}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:99px;transition:width .3s}
+.m-body{padding:18px;overflow:auto;scrollbar-width:thin;flex:1 1 auto;min-height:0}
+.qmeta{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.3px}
+.badge.choice{background:#eef2ff;color:#4338ca}
+.badge.fill{background:#ecfdf5;color:#047857}
+.ver{font-size:10.5px;color:#6d28d9;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:2px 8px}
+.topic{font-size:12.5px;color:#8a90a3}
+.qtext{font-size:15.5px;line-height:1.75;margin:0 0 14px;font-weight:500}
+.qtext code{background:#f1f2f9;border:1px solid #e6e8f2;border-radius:5px;padding:1px 5px;font-size:13.5px;color:#b5347a;font-weight:400}
+pre.code{background:#131a2b;color:#e6e9f5;border-radius:12px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.7;margin:0 0 14px;tab-size:4}
+pre.code code{font-family:inherit;color:inherit;background:none;border:0;padding:0}
+pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
+
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;gap:11px;align-items:flex-start;padding:11px 14px;border:1.5px solid #e7e9f3;border-radius:12px;cursor:pointer;background:#fcfcff;transition:.13s;font-size:14px}
+.opt:hover{border-color:#c7cbf5;background:#f7f8ff}
+.opt .k{flex:none;width:22px;height:22px;border-radius:7px;background:#eef0f8;color:#6b7280;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+.opt .t{flex:1;min-width:0}
+.opt .t code{background:#eef0f8;border-radius:4px;padding:1px 5px;font-size:12.8px;color:#b5347a}
+.opt.sel{border-color:#6366f1;background:#eef2ff;box-shadow:0 0 0 3px rgba(99,102,241,.13)}
+.opt.sel .k{background:#4f46e5;color:#fff}
+.opt.ok{border-color:#16a34a;background:#f0fdf4;box-shadow:none}
+.opt.ok .k{background:#16a34a;color:#fff}
+.opt.bad{border-color:#dc2626;background:#fef2f2;box-shadow:none}
+.opt.bad .k{background:#dc2626;color:#fff}
+.opt.dim{opacity:.45}
+.opt.lock{cursor:default}
+
+.fillwrap{margin-top:4px}
+.ans{width:100%;font-family:"Cascadia Code",Consolas,monospace;font-size:16px;padding:13px 15px;border:1.5px solid #e2e5f0;border-radius:12px;background:#fcfcff;outline:none;transition:.15s;color:#1b2033}
+.ans:focus{border-color:#6366f1;background:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.13)}
+.ans.right{border-color:#16a34a;background:#f0fdf4;color:#15803d}
+.ans.wrong{border-color:#dc2626;background:#fef2f2}
+.ans:disabled{opacity:1}
+.fhint{font-size:12px;color:#9aa0b4;margin:8px 2px 0}
+
+.fb{margin-top:16px;border-radius:12px;padding:13px 16px;font-size:13.5px;animation:pop .22s ease}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fb.ok{background:#f0fdf4;border:1px solid #bbf7d0}
+.fb.bad{background:#fef2f2;border:1px solid #fecaca}
+.fb.neutral{background:#f6f7fb;border:1px solid #e5e7f0}
+.fb-h{font-weight:700;margin-bottom:9px;font-size:14px}
+.fb.ok .fb-h{color:#15803d}
+.fb.bad .fb-h{color:#b91c1c}
+.fb.neutral .fb-h{color:#5b6175}
+.fb-row{display:flex;gap:8px;margin:5px 0;align-items:baseline;flex-wrap:wrap}
+.fb-row b{flex:none;font-size:11.5px;font-weight:600;color:#8a90a3;background:#fff;border:1px solid #e6e8f2;border-radius:5px;padding:1px 6px}
+.fb-row span{font-family:"Cascadia Code",Consolas,monospace;font-size:13px;word-break:break-word;color:#1b2033}
+.fb-why{margin-top:8px;color:#3f4559;line-height:1.72}
+.fb-src{margin-top:10px;font-size:11.5px;color:#9aa0b4}
+
+.m-foot{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid #f0f1f7;align-items:center;background:#fff;flex:none}
+.m-foot .btn.primary{margin-left:auto}
+
+/* ---------- 结果 ---------- */
+.res-hero{display:flex;gap:26px;align-items:center;background:#fff;border:1px solid #e8eaf2;border-radius:20px;padding:26px 30px;margin-bottom:16px}
+.ring{--p:0;--c:#4f46e5;width:132px;height:132px;flex:none;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#eef0f7 0);display:grid;place-items:center;position:relative}
+.ring::before{content:'';position:absolute;inset:10px;border-radius:50%;background:#fff}
+.ring-in{position:relative;text-align:center}
+.ring-in b{font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.ring-in span{font-size:13px;color:#8a90a3;margin-left:2px}
+.res-hero h2{margin:0 0 6px;font-size:21px}
+.res-hero p{margin:0;color:#6b7280;font-size:14px}
+.res-hero p+p{margin-top:4px}
+.grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.crow{padding:10px 0;border-bottom:1px dashed #f0f1f7}
+.crow:last-child{border-bottom:0;padding-bottom:0}
+.crow-h{display:flex;font-size:13px;margin-bottom:6px;gap:8px}
+.crow-h b{margin-left:auto;font-variant-numeric:tabular-nums;font-size:12.5px}
+.bar{height:7px;background:#eef0f7;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .7s cubic-bezier(.2,.8,.3,1)}
+.ctags{margin-top:7px;display:flex;flex-wrap:wrap;gap:6px}
+.ctags span{font-size:11.3px;color:#9a3412;background:#fff7ed;border:1px solid #fed7aa;border-radius:6px;padding:2px 7px}
+.wk{margin-bottom:14px}
+.wk h4{margin:0 0 6px;font-size:13px;color:#3730a3}
+.wk ul{margin:0;padding-left:18px;font-size:12.8px;color:#4b5268}
+.wk li{margin:3px 0}
+.wk li span{color:#a9afc3;font-size:11.3px;margin-left:6px}
+.wk p{background:#f8f9fd;border-radius:8px;padding:8px 10px;font-size:12.2px;color:#5b6175;margin:8px 0 0;line-height:1.65}
+.drow{border:1px solid #eceef6;border-radius:12px;padding:12px 14px;margin-bottom:9px}
+.drow.ok{border-left:3px solid #16a34a}
+.drow.bad{border-left:3px solid #dc2626}
+.dh{display:flex;gap:9px;align-items:center;font-size:13px;font-weight:600}
+.dh i{margin-left:auto;font-style:normal;flex:none}
+.dh i.y{color:#16a34a}
+.dh i.n{color:#dc2626}
+.dq{font-size:13px;color:#3f4559;margin:6px 0}
+.dq code{background:#f1f2f9;border-radius:4px;padding:0 4px;font-size:12.5px;color:#b5347a}
+.da{font-size:12.3px;color:#6b7280;background:#f7f8fd;border-radius:7px;padding:6px 9px;margin:6px 0;word-break:break-word}
+.dw{font-size:12.5px;color:#5b6175;line-height:1.65}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#1b2033;color:#fff;font-size:13px;padding:10px 18px;border-radius:11px;opacity:0;pointer-events:none;transition:.22s;z-index:90;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:80vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- 手机适配 ---------- */
+@media(max-width:640px){
+  .wrap{padding:16px 13px 64px}
+  .hdr{flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .hdr h1{font-size:17px}
+  .hdr p{font-size:12px}
+  .hstat{margin-left:0;order:3;width:100%;text-align:center;padding:7px 12px}
+  .hero{flex-direction:column;align-items:flex-start;gap:18px;padding:22px 20px}
+  .hero h2{font-size:19px}
+  .hero p{font-size:13px}
+  .hero-r{margin-left:0;width:100%;justify-content:space-between;gap:10px}
+  .hero-r b{font-size:22px}
+  .kbd-hint{display:none}
+  .panel{padding:16px 15px;border-radius:16px}
+  .startrow .btn{flex:1 1 auto;justify-content:center}
+  .chip{font-size:12px;padding:6px 11px}
+  .resume-bar{font-size:12px}
+  .resume-bar .sp{display:none}
+  .resume-bar .btn{margin-left:auto}
+  .overlay{padding:0;align-items:flex-end}
+  .modal{max-height:94vh;border-radius:18px 18px 0 0;width:100%}
+  .m-head{padding:14px 14px 10px}
+  .pbar{margin:0 14px}
+  .m-body{padding:14px}
+  .qtext{font-size:15px}
+  .opt{font-size:13.5px;padding:10px 12px;gap:9px}
+  .m-foot{padding:12px 14px 16px}
+  .m-foot .btn{padding:11px 16px}
+  .res-hero{flex-direction:column;text-align:center;gap:16px;padding:22px 18px}
+  .res-hero h2{font-size:18px}
+  .ring{width:112px;height:112px}
+  .ring-in b{font-size:29px}
+  pre.code{font-size:12px;padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div class="logo">Py</div>
+    <div>
+      <h1>Python 摸底测评 <span class="muted" style="font-size:12px">JC1001</span></h1>
+      <p>选择 + 填空 · 答完自动定位“还没懂”的章节与考点</p>
+    </div>
+    <div class="hstat" id="hstat">载入中…</div>
+  </header>
+
+  <section id="homeView">
+    <div class="hero">
+      <div>
+        <h2>先摸个底，再决定复习哪一章</h2>
+        <p>题目全部来自你的《Python 学习笔记》和《语句速查表》，外加一章 Python 3.9–3.14 实用新语法。每题答完立刻给解析，最后按章节告诉你哪块还没懂。</p>
+        <div class="kbd-hint"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> 或 <kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd> 选项 · <kbd>Enter</kbd> 确认 / 下一题 · <kbd>Esc</kbd> 退出</div>
+      </div>
+      <div class="hero-r">
+        <div><b id="s-total">0</b><span>题</span></div>
+        <div><b id="s-ch">14</b><span>章</span></div>
+        <div><b>2</b><span>类题型</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <h3>选范围</h3>
+        <div class="chips-ctrl"><button id="allOn">全选</button><button id="allOff">清空</button></div>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="resume-bar hide" id="resumeBar">
+        <span>上次做到第 <b id="rb-pos">-</b> 题，已答对 <b id="rb-ok">-</b> 题</span>
+        <span class="sp"></span>
+        <button class="btn primary small" id="resumeBtn">继续上次 →</button>
+        <button class="btn subtle small" id="discardBtn">丢弃</button>
+      </div>
+      <div class="startrow">
+        <button class="btn primary lg" id="startBtn">开始测评</button>
+        <button class="btn ghost" id="quickBtn">随机 20 题</button>
+        <button class="btn ghost" id="wrongBtn">只练错题</button>
+        <span class="laststat" id="laststat"></span>
+      </div>
+      <p class="laststat" id="storeState" style="margin:10px 2px 0"></p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><h3>知识点地图</h3><span class="muted">点开看考点 · 每章都能单独练</span></div>
+      <div id="kmap"></div>
+    </div>
+  </section>
+
+  <section id="resultView" class="hide"></section>
+</div>
+
+<div class="overlay" id="ov">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   章节元数据
+   ============================================================ */
+const CH = {
+  1:{name:'Python 是什么、怎么运行', short:'运行与注释', points:[
+      '脚本模式跑 `python hello.py`；交互模式（REPL）直接敲 `python`，提示符 `>>>`',
+      '交互模式表达式会自动回显，脚本模式必须 `print` 才看得到',
+      '注释只有 `#` 一种；多行注释就是每行都写 `#`'
+    ], pit:'把 `/* */` 或 `//` 当注释用，直接报错'},
+  2:{name:'输出 print 与输入 input', short:'print/input', points:[
+      '`print(a, b)` 多个参数默认用空格分开，结尾默认换行',
+      '`sep=` 管参数之间，`end=` 管结尾',
+      '`input()` 返回的永远是 `str`，做数学运算前必须 `int()` / `float()`'
+    ], pit:'`price = input()` 后写 `price * 2`，得到的是 `"100100"` 不是 200'},
+  3:{name:'变量与对象', short:'变量与对象', points:[
+      '变量是贴在对象上的名字（引用），不是装数据的盒子',
+      '`a, b = b, a` 一行交换；`x = y = z = 0` 三个名字指同一个值',
+      '对象三要素：身份 `id()`、类型 `type()`、值'
+    ], pit:'以为 `m = n` 是复制；`x, y = 1, 2, 3` 会 ValueError'},
+  4:{name:'命名、关键字与风格', short:'命名关键字', points:[
+      '只能由字母、数字、下划线组成，不能数字开头，不能是关键字，区分大小写',
+      '`class`、`if`、`for` 这些是关键字，绝对不能当变量名',
+      '推荐 snake_case（`my_number`）；常量约定全大写'
+    ], pit:'`my-name`、`99redBallons`、`class = "x"` 全都非法'},
+  5:{name:'数据类型与类型转换', short:'类型转换', points:[
+      '四种基础类型：`str` / `int` / `float` / `bool`，`True`/`False` 首字母必须大写',
+      'bool 本质上是 int 的子类：`True + 1 == 2`',
+      '`int()` 对小数是截断不四舍五入，要四舍五入用 `round()`'
+    ], pit:'`int("9.8")` 是 ValueError，得先 `float` 再 `int`'},
+  6:{name:'表达式、语句与运算符', short:'运算符', points:[
+      '算术七个：`+ - * / // % **`；`//` 向下取整，`%` 余数符号跟除数走',
+      '优先级：`()` > `**` > `* / // %` > `+ -`，同级从左到右',
+      '`and` / `or` 会短路；`==` 比值，`is` 比身份，`in` 比成员'
+    ], pit:'`-5 // 2` 是 -3 不是 -2；`if x = 5:` 是语法错误'},
+  7:{name:'条件语句', short:'条件语句', points:[
+      '`if` / `if-else` / `if-elif-else`：条件后必须冒号，代码块缩进 4 空格',
+      '`elif` 从上往下判断，命中第一个 True 就跳出整条链',
+      '三元：`A if 条件 else B`；`pass` 是什么都不做的占位'
+    ], pit:'缩进错层不报错，但逻辑全错——比报错更危险'},
+  8:{name:'字符串格式化', short:'字符串格式化', points:[
+      '三种写法 `%` / `.format()` / f-string，推荐 f-string',
+      '`f"{x:.2f}"` 保留两位小数；`%d` 直接截断',
+      '`+` 只能拼字符串，`*` 可以重复'
+    ], pit:'`"a" + 1` 是 TypeError，要写成 `"a" + str(1)`'},
+  9:{name:'循环', short:'循环', points:[
+      '`while` 靠条件退出；`for` 遍历序列；`range(start, stop, step)` 含头不含尾',
+      '`break` 跳出整层，`continue` 跳过本次；循环 `else` 只在自然结束时执行',
+      '嵌套循环：内层计数器必须在外层循环体里重置'
+    ], pit:'`continue` 写在 `i += 1` 之前 → 死循环'},
+  10:{name:'列表 List', short:'列表', points:[
+      '有序、可变、可重复、可异构；下标从 0 开始，`-1` 是最后一个',
+      '切片含头不含尾，`a[::-1]` 反转，切片赋值长度可以不等',
+      '`append` 加一个，`extend` 加一串；`sort()` 原地改并返回 None'
+    ], pit:'`remove(2)` 删的是“值 2”，不是第 2 项'},
+  11:{name:'字典 Dictionary', short:'字典', points:[
+      '键值对存储，键唯一且必须不可变；3.7+ 保持插入顺序',
+      '`d[k]` 键不存在就 KeyError，`d.get(k, 默认值)` 才安全',
+      '`= ` 只是别名，`copy()` 才是复制（浅拷贝）'
+    ], pit:'一边遍历一边增删键 → RuntimeError'},
+  12:{name:'函数', short:'函数', points:[
+      '`def 名字(参数):` 后面缩进写函数体，先定义后调用',
+      '`return` 把结果交回调用处；没有 `return` 时返回 `None`',
+      '`print` 是显示出来，`return` 是交回去'
+    ], pit:'只写 `add(1, 2)` 不会有任何输出，得套 `print()`'},
+  13:{name:'报错类型与常见异常', short:'报错类型', points:[
+      '语法错误跑不起来 / 运行时错误跑到那行才崩 / 逻辑错误能跑但结果错',
+      '常见异常：SyntaxError、IndentationError、NameError、TypeError、ValueError、IndexError、KeyError、ZeroDivisionError',
+      '逻辑错误没有任何报错，最难查'
+    ], pit:'把逻辑错误当成“程序没问题”，结果一直不对'},
+  14:{name:'现代 Python 实用新语法', short:'新语法', points:[
+      '海象 `:=` 在表达式里赋值；`match/case` 结构模式匹配（3.10+）',
+      '`d1 | d2` 合并字典（3.9+）；`first, *rest = lst` 解包',
+      '`enumerate` / `zip` / `f"{x=}"` / `removeprefix` / `sorted(key=)` 日常最常用'
+    ], pit:'`match` 是“匹配”不是 `if`；`:=` 不加括号会把整个比较结果赋进去'}
+};
+
+/* ============================================================
+   题库
+   ============================================================ */
+const BANK = [
+/* ---------- Ch1 运行方式与注释 ---------- */
+{id:"q01",ch:1,topic:"1.2 交互模式 vs 脚本模式",sec:"§1.2",type:"choice",
+ q:"在脚本 hello.py 里只写了一行 `1 + 2`，运行 `python hello.py` 之后屏幕上会看到什么？",
+ opts:["3","什么都不显示","SyntaxError","None"],ans:1,
+ why:"脚本模式下表达式的结果不会自动显示，只有交互模式 >>> 才会回显。要看到结果必须写 `print(1 + 2)`。"},
+{id:"q02",ch:1,topic:"1.2 两种运行方式",sec:"§1.2",type:"choice",
+ q:"在交互模式（REPL，提示符 `>>>`）里想退出，通常输入什么？",
+ opts:["exit()","stop()","close()","Ctrl+Alt+Del"],ans:0,
+ why:"`exit()` 或 `quit()` 都能退出；Windows 上也可以按 Ctrl+Z 再回车。脚本模式没有 >>> 提示符。"},
+{id:"q03",ch:1,topic:"1.3 注释写法",sec:"§1.3",type:"choice",
+ q:"想在 .py 文件里写 3 行说明文字当注释，哪种做法是对的？",
+ opts:["用 `/* 三行说明 */` 包起来","每行开头都写 `//`","每一行前面都加 `#`","必须写成三引号 docstring"],ans:2,
+ why:"Python 只有 `#` 一种注释符号，多行就是每行都写 `#`。三引号字符串放在模块或函数开头叫 docstring，它本质仍是字符串对象，不是注释语法。"},
+
+/* ---------- Ch2 print / input ---------- */
+{id:"q04",ch:2,topic:"2.1 print 的 sep 参数",sec:"§2.1",type:"fill",
+ q:"下面这行输出什么？",code:`print('a', 'b', sep='-')`,a:["a-b"],
+ why:"`sep` 指定多个参数之间的分隔符，默认是空格，这里改成了 `-`。"},
+{id:"q05",ch:2,topic:"2.1 print 多参数默认空格",sec:"§2.1",type:"fill",
+ q:"下面这行输出什么？",code:`print('Sum:', 5 + 10)`,a:["Sum: 15"],
+ why:"print 的多个参数默认用空格隔开；`5 + 10` 先算成 15 再打印。"},
+{id:"q06",ch:2,topic:"2.2 input 返回的是字符串",sec:"§2.2",type:"fill",
+ q:"用户输入 `100` 之后，下面代码输出什么？",code:`price = input('Price: ')
+print(price * 2)`,a:["100100","Price: 100100"],
+ why:"`input()` 拿到的永远是 str，`'100' * 2` 是字符串重复两遍，不是 200。要算术必须先 `float(input(...))`。"},
+{id:"q07",ch:2,topic:"2.3 完整例子：加价 20%",sec:"§2.3",type:"fill",
+ q:"用户输入 `100` 之后，输出的整行结果是什么？",code:`net_price = float(input('Price: '))
+final_price = (0.2 * net_price) + net_price
+print(f'Final price = {final_price}')`,a:["Final price = 120.0","Price: Final price = 120.0"],
+ why:"先转成 float 再算 0.2×100+100=120.0；f-string 把 float 原样插进去，所以带 `.0`。"},
+{id:"q08",ch:2,topic:"2.1 print 的 end 参数",sec:"§2.1",type:"choice",
+ q:"想让两次 print 的结果留在同一行，应该改哪个参数？",
+ opts:["`sep=''`","`end=''`","`flush=True`","`same_line=True`"],ans:1,
+ why:"`end` 控制结尾字符，默认是换行符，改成空串或空格就不换行。`sep` 管的是多个参数之间。"},
+
+/* ---------- Ch3 变量与对象 ---------- */
+{id:"q09",ch:3,topic:"3.4 赋值是引用不是复制",sec:"§3.4",type:"fill",
+ q:"下面代码输出什么？",code:`n = 3000
+m = n
+m = 6000
+print(n, m)`,a:["3000 6000"],
+ why:"`m = n` 只是让两个名字指向同一个对象；给 m 重新赋值只是让它改指 6000，n 不受影响。"},
+{id:"q10",ch:3,topic:"3.2 多重赋值与交换",sec:"§3.2",type:"fill",
+ q:"下面代码输出什么？",code:`a, b = 1, 2
+a, b = b, a
+print(a, b)`,a:["2 1"],
+ why:"右边的 `(b, a)` 先算成一个元组，再按位置赋回去，所以一次就完成交换。"},
+{id:"q11",ch:3,topic:"3.2 多重赋值个数不匹配",sec:"§3.2",type:"choice",
+ q:"`x, y = 'one', 'two', 'three'` 会发生什么？",
+ opts:["x 得到 'one'，y 得到 'two'，多的丢掉","ValueError: too many values to unpack","正常执行，x 得到整个元组","TypeError"],ans:1,
+ why:"左边 2 个名字、右边 3 个值，个数必须一致，否则 ValueError。"},
+{id:"q12",ch:3,topic:"3.3 is 与 == 的区别（对象身份）",sec:"§3.3",type:"choice",
+ q:"下面代码输出什么？",code:`a = [1, 2]
+b = a
+c = [1, 2]
+print(a is b, a is c, a == c)`,
+ opts:["True True True","True False True","False True True","True False False"],ans:1,
+ why:"b 和 a 是同一个对象（`is` 为 True）；c 是另建的同内容列表，值相等（`==` 为 True）但不是同一个对象（`is` 为 False）。"},
+{id:"q13",ch:3,topic:"3.5 变量的五个特征",sec:"§3.5",type:"choice",
+ q:"描述一个变量时，“作用域（scope）”指的是什么？",
+ opts:["变量里存的值","名字能被访问到的范围","对象占多少内存","变量从创建到销毁的时间"],ans:1,
+ why:"Scope 是名字能被访问的范围（局部 / 全局）；“从创建到销毁”那是生命周期（lifetime）。"},
+
+/* ---------- Ch4 命名与关键字 ---------- */
+{id:"q14",ch:4,topic:"4.1 命名的硬性规则",sec:"§4.1",type:"choice",
+ q:"下面哪个变量名是合法的？",
+ opts:["99redBallons","my_number","my-number","class"],ans:1,
+ why:"变量名只能由字母、数字、下划线组成，不能数字开头、不能有连字符、不能用关键字。`my_number` 合规。"},
+{id:"q15",ch:4,topic:"4.2 关键字",sec:"§4.2",type:"choice",
+ q:"下面哪个是 Python 关键字，绝对不能拿来当变量名？",
+ opts:["print","input","class","list"],ans:2,
+ why:"print / input / list 都是内置函数，技术上能被同名变量覆盖（很不推荐）；`class` 是保留关键字，`class = 'x'` 直接 SyntaxError。"},
+{id:"q16",ch:4,topic:"4.3 命名风格与常量",sec:"§4.3",type:"choice",
+ q:"按命名约定，表示“不会再变的上限值”应该写成？",
+ opts:["Maximum","maximum","MAXIMUM","max_imum"],ans:2,
+ why:"常量约定全大写（MAXIMUM）；普通变量用 snake_case（my_number）；类名才用 MyClass。"},
+{id:"q17",ch:4,topic:"4.1 变量名的组成字符",sec:"§4.1",type:"fill",
+ q:"变量名只能由字母、数字和（　）组成。括号里填什么？",
+ a:["下划线","_","underscore"],
+ why:"也就是 `_`。数字不能打头，也不能包含空格、连字符、@ 等特殊字符。"},
+
+/* ---------- Ch5 类型与转换 ---------- */
+{id:"q18",ch:5,topic:"5.3 int() 是截断不是四舍五入",sec:"§5.3",type:"fill",
+ q:"下面这行输出什么？",code:`print(int(9.8))`,a:["9"],
+ why:"`int()` 对小数是直接截断，不是四舍五入；要四舍五入用 `round(9.8)` 得 10。"},
+{id:"q19",ch:5,topic:"5.3 int 转小数形式的字符串",sec:"§5.3",type:"choice",
+ q:"`print(int('9.8'))` 的结果是？",
+ opts:["9","9.8","ValueError","TypeError"],ans:2,
+ why:"`int()` 只接受整数字符串；`'9.8'` 得先转 float 再转 int：`int(float('9.8'))` 才是 9。"},
+{id:"q20",ch:5,topic:"5.2 bool 本质上是 int",sec:"§5.2",type:"fill",
+ q:"下面这行输出什么？",code:`print(True + 1)`,a:["2"],
+ why:"bool 是 int 的子类，True 当 1 用、False 当 0 用，所以结果是 2。"},
+{id:"q21",ch:5,topic:"5.3 哪些转换会报错",sec:"§5.3",type:"choice",
+ q:"下面哪个转换会报错？",
+ opts:["float('3.14')","str(42)","bool(0)","int('abc')"],ans:3,
+ why:"`int('abc')` 是 ValueError（类型对、值不对）。`bool(0)` 是合法的，得到 False。"},
+{id:"q22",ch:5,topic:"5.1 type() 的返回值",sec:"§5.1",type:"fill",
+ q:"`print(type(3.14))` 输出什么？",
+ a:["<class 'float'>"],
+ why:"type() 返回对象的类型，格式是 `<class 'float'>`（尖括号和单引号都不能少）。"},
+
+/* ---------- Ch6 运算符 ---------- */
+{id:"q23",ch:6,topic:"6.2 // 向下取整（负数）",sec:"§6.2",type:"fill",
+ q:"下面这行输出什么？",code:`print(-5 // 2)`,a:["-3"],
+ why:"`//` 是地板除，向下取整。-2.5 向下是 -3，不是 -2——负数最容易错。"},
+{id:"q24",ch:6,topic:"6.2 % 余数符号跟除数走",sec:"§6.2",type:"fill",
+ q:"下面这行输出什么？",code:`print(-12 % 7)`,a:["2"],
+ why:"余数的符号跟“除数”走，除数是 7（正数），所以结果是 2。可以用 `n = d * (n // d) + (n % d)` 验算。"},
+{id:"q25",ch:6,topic:"6.2 负数的取余",sec:"§6.2",type:"fill",
+ q:"下面这行输出什么？",code:`print(12 % -7)`,a:["-2"],
+ why:"余数符号跟除数走，除数是 -7（负数），所以结果是 -2。"},
+{id:"q26",ch:6,topic:"6.4 增强赋值运算符",sec:"§6.4",type:"fill",
+ q:"下面代码最后输出什么？",code:`x = 10
+x += 5
+x -= 3
+x *= 2
+x //= 5
+print(x)`,a:["4"],
+ why:"10→15→12→24→4。`x //= 5` 就是 `x = x // 5`。"},
+{id:"q27",ch:6,topic:"6.3 运算符优先级",sec:"§6.3",type:"fill",
+ q:"下面这行输出什么？",code:`print(1 + 2 ** 3)`,a:["9"],
+ why:"`**` 的优先级高于 `+`，先算 2**3=8，再加 1。"},
+{id:"q28",ch:6,topic:"6.3 同级运算从左到右",sec:"§6.3",type:"fill",
+ q:"下面这行输出什么？",code:`print(50 / 2 * 4)`,a:["100.0"],
+ why:"乘除同级，从左到右：先 50/2=25.0，再 ×4。真除 `/` 的结果一定是 float，所以是 100.0。"},
+{id:"q29",ch:6,topic:"6.3 优先级综合",sec:"§6.3",type:"fill",
+ q:"下面这行输出什么？",code:`print(2 + 3 * 4 ** 2)`,a:["50"],
+ why:"先 `**` 得 16，再 ×3 得 48，最后 +2 得 50。拿不准就加括号。"},
+{id:"q30",ch:6,topic:"6.6 逻辑运算的短路",sec:"§6.6",type:"choice",
+ q:"下面代码运行结果是？",code:`x = 0
+if x != 0 and 10 / x > 1:
+    print('big')`,
+ opts:["ZeroDivisionError","什么都不输出，也不报错","输出 big","SyntaxError"],ans:1,
+ why:"`and` 左边 `x != 0` 是 False 就短路，右边的 10/x 根本不会算，所以既不报除零错也不进 if。"},
+{id:"q31",ch:6,topic:"6.5 = 是赋值，== 才是比较",sec:"§6.5",type:"choice",
+ q:"`if x = 5:` 会怎样？",
+ opts:["把 5 赋给 x，条件为真","SyntaxError：赋值不能写在 if 条件里","永远为 False","NameError"],ans:1,
+ why:"`=` 是赋值，`==` 才是比较。`if x = 5:` 语法错误，程序根本跑不起来。"},
+{id:"q32",ch:6,topic:"6.7 判断 None 为什么用 is",sec:"§6.7",type:"choice",
+ q:"判断变量 x 是不是 None，推荐写法是？",
+ opts:["x == None","x is None","x = None","not x"],ans:1,
+ why:"判 None 用 `is`（比身份）。`== None` 能跑但不推荐；`not x` 会把 0、空串、空列表也判成“空”，意思就变了。"},
+{id:"q33",ch:6,topic:"6.7 成员运算符 in",sec:"§6.7",type:"fill",
+ q:"下面这行输出什么？",code:`print('a' in 'cat', 3 in [1, 2, 3])`,a:["True True"],
+ why:"`in` 用在字符串上是查子串，用在列表上是查元素，结果都是 bool。"},
+
+/* ---------- Ch7 条件语句 ---------- */
+{id:"q34",ch:7,topic:"7.2 if-elif-else 的执行顺序",sec:"§7.2",type:"fill",
+ q:"下面代码输出什么？",code:`score = 75
+if score >= 90:
+    print('A')
+elif score >= 75:
+    print('B')
+elif score >= 60:
+    print('C')
+else:
+    print('D')`,a:["B"],
+ why:"从上往下命中第一个 True 就跳出整条链，所以是 B，不会再去看 `>= 60`。"},
+{id:"q35",ch:7,topic:"7.4 三元运算符",sec:"§7.4",type:"fill",
+ q:"下面代码输出什么？",code:`age = 20
+ticket_price = 30 if age >= 18 else 15
+print(ticket_price)`,a:["30"],
+ why:"三元写法是“结果在前、条件在中间、否则结果在后”：`A if 条件 else B`。"},
+{id:"q36",ch:7,topic:"7.3 漏缩进报什么错",sec:"§7.3",type:"choice",
+ q:"下面代码会怎样？",code:`x = 5
+if x > 2:
+print('big')`,
+ opts:["正常输出 big","IndentationError","SyntaxError","什么都不输出"],ans:1,
+ why:"if 后面必须有一条缩进的语句。漏缩进报 IndentationError（缩进类错误），不是普通语法错误。"},
+{id:"q37",ch:7,topic:"7.3 缩进错层 = 逻辑错误",sec:"§7.3",type:"choice",
+ q:"下面代码运行结果是？",code:`age = 13
+if age >= 18:
+    print('可以喝酒')
+print('来点威士忌！')`,
+ opts:["两行都输出","只输出“来点威士忌！”","只输出“可以喝酒”","IndentationError"],ans:1,
+ why:"最后一行没缩进，不在 if 里，所以 13 岁也照样打印——不报错但逻辑错，这是最危险的一类错误。"},
+{id:"q38",ch:7,topic:"7.5 pass 的作用",sec:"§7.5",type:"choice",
+ q:"`pass` 的作用是？",
+ opts:["立即结束程序","占位：语法上要有语句，但什么都不做","跳过本次循环","结束当前函数并返回 None"],ans:1,
+ why:"pass 是空语句，用来搭骨架；跳过本次循环是 `continue`，结束函数是 `return`。"},
+{id:"q39",ch:7,topic:"7.2 elif 命中第一个就跳出",sec:"§7.2",type:"choice",
+ q:"下面代码输出什么？",code:`x = 5
+if x > 0:
+    print('A')
+elif x > 1:
+    print('B')`,
+ opts:["A","B","A 和 B 都输出","什么都不输出"],ans:0,
+ why:"第一个条件已经为 True，后面的 elif 直接跳过——即使 `x > 1` 也成立。"},
+/* ---------- Ch8 字符串格式化 ---------- */
+{id:"q40",ch:8,topic:"8.3 f-string 控制小数位",sec:"§8.3",type:"fill",
+ q:"下面代码输出什么？",code:`price = 89.5
+print(f"价格：{price:.2f} 元")`,a:["价格：89.50 元"],
+ why:"`:.2f` 表示保留 2 位小数，会补零，所以是 89.50 而不是 89.5。"},
+{id:"q41",ch:8,topic:"8.2 %d 的截断",sec:"§8.2",type:"fill",
+ q:"下面这行输出什么？",code:`print('%d' % 3.9)`,a:["3"],
+ why:"`%d` 只打印整数部分（截断），不四舍五入。"},
+{id:"q42",ch:8,topic:"8.4 字符串只能和字符串相加",sec:"§8.4",type:"choice",
+ q:"`print('a' + 1)` 会怎样？",
+ opts:["输出 a1","输出 1","TypeError","ValueError"],ans:2,
+ why:"字符串只能和字符串相加，要写成 `'a' + str(1)`。"},
+{id:"q43",ch:8,topic:"8.4 字符串重复",sec:"§8.4",type:"fill",
+ q:"下面这行输出什么？",code:`print(len('-' * 20))`,a:["20"],
+ why:"`'-' * 20` 是重复 20 次，长度就是 20。"},
+{id:"q44",ch:8,topic:"8.1 三种格式化写法",sec:"§8.1",type:"choice",
+ q:"要把变量塞进字符串，本课推荐用哪种写法？",
+ opts:["'%s' % x","'{}'.format(x)","f'{x}'","'x' + str(x)"],ans:2,
+ why:"f-string 最直观，Python 3.6+ 都有；`%` 是最老写法，`.format()` 居中。"},
+
+/* ---------- Ch9 循环 ---------- */
+{id:"q45",ch:9,topic:"9.7 range 的步长与倒序",sec:"§9.7",type:"fill",
+ q:"下面这行输出什么？",code:`print(list(range(10, 0, -2)))`,a:["[10, 8, 6, 4, 2]"],
+ why:"`range(start, stop, step)` 含头不含尾：从 10 开始每次 -2，到 0 之前停。"},
+{id:"q46",ch:9,topic:"9.7 range(1, 8, 2)",sec:"§9.7",type:"fill",
+ q:"下面代码逐行打印出什么？（写成一行，用空格分隔）",code:`for i in range(1, 8, 2):
+    print(i)`,a:["1 3 5 7"],
+ why:"1、3、5、7；9 已经到 8 之后了，不包含。"},
+{id:"q47",ch:9,topic:"9.4 循环 else 与 break",sec:"§9.4",type:"choice",
+ q:"下面代码输出什么？",code:`i = 0
+while i < 3:
+    if i == 1:
+        break
+    i += 1
+else:
+    print('done')`,
+ opts:["done","什么都不输出","0 1 2 然后 done","SyntaxError"],ans:1,
+ why:"else 只在循环“自然结束”时执行；被 break 打断就不执行。这里 i==1 就 break 了，所以什么都不输出。"},
+{id:"q48",ch:9,topic:"9.3 continue 的位置陷阱",sec:"§9.3",type:"choice",
+ q:"下面代码的问题是什么？",code:`i = 0
+while i < 5:
+    if not i % 2:
+        continue
+    i += 1
+    print(i)`,
+ opts:["正常输出 1 3 5","死循环：i 一直是 0","输出 0 2 4","IndentationError"],ans:1,
+ why:"i 是 0，`not i % 2` 为 True 直接 continue，`i += 1` 永远执行不到 → 死循环。continue 之前一定要先自增。"},
+{id:"q49",ch:9,topic:"9.9 嵌套循环的执行次数",sec:"§9.9",type:"fill",
+ q:"`for i in range(1, 11):` 里面再套一层 `for j in range(1, 11):`，内层循环体一共执行多少次？",
+ a:["100"],
+ why:"外层 10 次 × 内层 10 次 = 100 次。"},
+{id:"q50",ch:9,topic:"9.5 嵌套 while 的内层重置",sec:"§9.5",type:"choice",
+ q:"嵌套 while 里，内层计数器 j 如果只在循环外写了一次 `j = 0`，会怎样？",
+ opts:["内层每次都能完整跑完","只有第一轮外层能进内层","死循环","报 NameError"],ans:1,
+ why:"第一轮结束后 j 已经是终止值，后面每轮内层条件直接为假，内层再也不跑。每进一次外层都要重新 `j = 0`。"},
+{id:"q51",ch:9,topic:"9.10 迭代器与 StopIteration",sec:"§9.10",type:"choice",
+ q:"下面代码最后一行会怎样？",code:`colours = ('red', 'green', 'blue')
+it = iter(colours)
+next(it); next(it); next(it)
+print(next(it))`,
+ opts:["输出 red","输出 None","StopIteration","IndexError"],ans:2,
+ why:"next() 取完还取会抛 StopIteration。for 循环内部就是 iter() + 反复 next()，取完自动停。"},
+{id:"q52",ch:9,topic:"9.6 字符串也能被 for 遍历",sec:"§9.6",type:"fill",
+ q:"`for ch in 'JC1001':` 的循环体一共执行几次？",a:["6"],
+ why:"字符串可遍历，'JC1001' 有 6 个字符。"},
+{id:"q53",ch:9,topic:"9.7 range 不是列表",sec:"§9.7",type:"fill",
+ q:"下面这行输出什么？",code:`print(range(5))`,a:["range(0, 5)"],
+ why:"range 是惰性的序列对象，不是列表；要看内容得 `list(range(5))`。"},
+{id:"q54",ch:9,topic:"9.12 while 与 for 怎么选",sec:"§9.12",type:"choice",
+ q:"要“一直读用户输入，直到输入 quit 为止”（次数未知），应该用？",
+ opts:["for i in range(n)","while","列表推导式","递归"],ans:1,
+ why:"次数未知、靠条件退出用 while；已知次数或遍历序列才用 for。"},
+
+/* ---------- Ch10 列表 ---------- */
+{id:"q55",ch:10,topic:"10.2 负索引 -1",sec:"§10.2",type:"fill",
+ q:"下面代码输出什么？",code:`a = ['item1', 'item2', 'item3', 'item4']
+print(a[-1])`,a:["item4"],
+ why:"`-1` 永远是最后一个元素。"},
+{id:"q56",ch:10,topic:"10.2 切片含头不含尾",sec:"§10.2",type:"fill",
+ q:"下面代码输出什么？",code:`a = ['item1', 'item2', 'item3', 'item4']
+print(a[1:3])`,
+ a:["['item2', 'item3']"],
+ why:"从下标 1 到下标 2（不含 3），所以是两个元素。"},
+{id:"q57",ch:10,topic:"10.2 切片反转",sec:"§10.2",type:"fill",
+ q:"下面代码输出什么？",code:`a = ['item1', 'item2', 'item3', 'item4']
+print(a[::-1])`,
+ a:["['item4', 'item3', 'item2', 'item1']"],
+ why:"步长写 -1 就是整体反转。"},
+{id:"q58",ch:10,topic:"10.4 append 与 extend",sec:"§10.4",type:"choice",
+ q:"下面代码输出什么？",code:`a = [1, 2]
+a.append([3, 4])
+print(a)`,
+ opts:["[1, 2, 3, 4]","[1, 2, [3, 4]]","[3, 4, 1, 2]","TypeError"],ans:1,
+ why:"append 把整个列表当成“一个元素”塞到末尾；要逐个加入用 extend。"},
+{id:"q59",ch:10,topic:"10.5 remove 是按值删",sec:"§10.5",type:"choice",
+ q:"下面代码会怎样？",code:`c = ['red', 'green', 'blue']
+c.remove(2)`,
+ opts:["删掉第 2 项 'green'","删掉 'blue'","ValueError","TypeError"],ans:2,
+ why:"remove(x) 删的是“值为 x”的第一个元素，不是下标；列表里没有 2 就 ValueError。按下标删用 `pop(2)` 或 `del c[2]`。"},
+{id:"q60",ch:10,topic:"10.8 sort() 的返回值",sec:"§10.8",type:"choice",
+ q:"`lst.sort()` 的返回值是什么？",
+ opts:["排好序的新列表","None（原地修改）","原列表本身","True"],ans:1,
+ why:"sort / reverse 都是原地修改并返回 None，所以 `x = lst.sort()` 会让 x 变成 None。"},
+{id:"q61",ch:10,topic:"10.8 sorted 与 sort 的区别",sec:"§10.8",type:"choice",
+ q:"想“保留原列表、另外拿到一份排好序的新列表”，用哪个？",
+ opts:["lst.sort()","lst.reverse()","sorted(lst)","lst.copy()"],ans:2,
+ why:"sorted() 返回新列表，原列表不动。"},
+{id:"q62",ch:10,topic:"10.7 列表推导式",sec:"§10.7",type:"fill",
+ q:"下面这行输出什么？",code:`print([x for x in range(1, 11) if x % 2 == 0])`,
+ a:["[2, 4, 6, 8, 10]"],
+ why:"1 到 10 里取偶数：2、4、6、8、10。"},
+{id:"q63",ch:10,topic:"10.3 切片赋值",sec:"§10.3",type:"fill",
+ q:"下面代码输出什么？",code:`s = ['bread', 'noodles', 'soup', 'apples']
+s[2:3] = ['pasta', 'tomato']
+print(s)`,
+ a:["['bread', 'noodles', 'pasta', 'tomato', 'apples']"],
+ why:"切片左边“剪掉”1 个、右边贴进 2 个，长度可以不等，所以列表变长。"},
+{id:"q64",ch:10,topic:"10.2 list() 拆字符串",sec:"§10.2",type:"fill",
+ q:"下面这行输出什么？",code:`print(list('aeiou'))`,a:["['a', 'e', 'i', 'o', 'u']"],
+ why:"list() 把字符串拆成单个字符的列表。"},
+{id:"q65",ch:10,topic:"10.6 带下标遍历列表",sec:"§10.6",type:"choice",
+ q:"遍历列表时还要拿到下标，最直接的写法是？",
+ opts:["for i in c: print(i, c[i])","for i in range(len(c)): print(i, c[i])","for i, c[i] in c: print(i)","for i in c: print(c[i])"],ans:1,
+ why:"`range(len(c))` 生成下标，再用 `c[i]` 取元素。更现代的写法是 `enumerate(c)`，第 14 章会讲。"},
+
+/* ---------- Ch11 字典 ---------- */
+{id:"q66",ch:11,topic:"11.2 方括号取不存在的键",sec:"§11.2",type:"choice",
+ q:"下面代码会怎样？",code:`book = {'title': 'Python', 'year': 2021}
+print(book['isbn'])`,
+ opts:["输出 None","输出空字符串","KeyError","IndexError"],ans:2,
+ why:"键不存在时 `d[k]` 直接 KeyError；安全取值用 `book.get('isbn')`。"},
+{id:"q67",ch:11,topic:"11.2 get 的默认值",sec:"§11.2",type:"fill",
+ q:"下面代码输出什么？",code:`book = {'title': 'Python', 'year': 2021}
+print(book.get('isbn', '无'))`,a:["无"],
+ why:"`get(k, 默认值)` 在键不存在时返回默认值，不报错。"},
+{id:"q68",ch:11,topic:"11.4 popitem 删最后一个键值对",sec:"§11.4",type:"choice",
+ q:"要“删掉字典最后一个键值对并把它返回”，用哪个？",
+ opts:["d.pop()","d.popitem()","d.remove()","del d[-1]"],ans:1,
+ why:"`pop(k)` 必须给键；`popitem()` 才是删最后一项并返回 (键, 值)。不带参数的 `pop()` 会 TypeError。"},
+{id:"q69",ch:11,topic:"11.1 重复键静默覆盖",sec:"§11.1",type:"fill",
+ q:"下面代码输出什么？",code:`d = {'title': 'v1', 'title': 'v2'}
+print(d)`,a:["{'title': 'v2'}"],
+ why:"键唯一，后写的静默覆盖前一个，而且不报错。"},
+{id:"q70",ch:11,topic:"11.5 遍历字典默认拿到键",sec:"§11.5",type:"choice",
+ q:"下面代码打印出什么？",code:`user = {'id': 1234, 'age': 25}
+for k in user:
+    print(k)`,
+ opts:["id 和 age","1234 和 25","(id, 1234) 和 (age, 25)","报错"],ans:0,
+ why:"`for k in d` 默认遍历键；要值用 `d.values()`，要键值对用 `d.items()`。"},
+{id:"q71",ch:11,topic:"11.5 遍历时不能增删键",sec:"§11.5",type:"choice",
+ q:"一边 `for k in d:` 一边 `del d[k]` 会怎样？",
+ opts:["正常删除","RuntimeError: dictionary changed size during iteration","KeyError","死循环"],ans:1,
+ why:"遍历过程中字典大小变了会报 RuntimeError；要改就先遍历 `list(d.keys())` 的副本。"},
+{id:"q72",ch:11,topic:"11.7 = 是别名，copy() 才是复制",sec:"§11.7",type:"choice",
+ q:"下面代码跑完后，`a['x']` 和 `c['x']` 分别是？",code:`a = {'x': 1}
+b = a
+c = a.copy()
+b['x'] = 99`,
+ opts:["99 和 99","99 和 1","1 和 1","1 和 99"],ans:1,
+ why:"`b = a` 是别名，改 b 等于改 a；`copy()` 才是新字典，顶层独立（注意是浅拷贝）。"},
+{id:"q73",ch:11,topic:"11.6 字典推导式 + 过滤",sec:"§11.6",type:"fill",
+ q:"下面代码输出什么？",code:`p2 = {'drive': 90, 'bag': 25, 'cable': 10}
+print({p: v for p, v in p2.items() if v < 40})`,
+ a:["{'bag': 25, 'cable': 10}"],
+ why:"过滤掉价格 ≥ 40 的，只留下 bag 和 cable。"},
+{id:"q74",ch:11,topic:"11.8 嵌套字典取值",sec:"§11.8",type:"fill",
+ q:"下面代码输出什么？",code:`cars = {'Kia': {'model': 'Rio', 'year': 2019}, 'VW': {'model': 'Golf'}}
+print(cars['Kia']['model'])`,a:["Rio"],
+ why:"连续用两个 `[]` 一层一层往下取。"},
+{id:"q75",ch:11,topic:"11.1 键必须不可变",sec:"§11.1",type:"choice",
+ q:"下面哪种类型不能当字典的键？",
+ opts:["字符串","整数","元组","列表"],ans:3,
+ why:"键必须不可变（可哈希）；列表可变所以不能当键，元组可以。"},
+
+/* ---------- Ch12 函数 ---------- */
+{id:"q76",ch:12,topic:"12 print 与 return 的区别",sec:"§12",type:"choice",
+ q:"单独运行下面这段，屏幕上会看到什么？",code:`def add(a, b):
+    return a + b
+add(1, 2)`,
+ opts:["3","什么都不显示","None","TypeError"],ans:1,
+ why:"return 只是把结果交回调用处，不会显示；要看到得写 `print(add(1, 2))`。"},
+{id:"q77",ch:12,topic:"12 没有 return 时返回 None",sec:"§12",type:"choice",
+ q:"函数里没写 return，调用后得到的返回值是？",
+ opts:["0","空字符串","None","报错"],ans:2,
+ why:"没有 return 时函数返回 None。"},
+{id:"q78",ch:12,topic:"12 返回值可以直接打印",sec:"§12",type:"fill",
+ q:"下面代码输出什么？",code:`def simple_add(a, b):
+    return a + b
+print(simple_add(1, 2))`,a:["3"],
+ why:"这次套了 print，所以能看到 3。"},
+{id:"q79",ch:12,topic:"12 必须先定义后调用",sec:"§12",type:"choice",
+ q:"在函数定义之前就调用它，会报什么错？",
+ opts:["NameError","TypeError","SyntaxError","IndentationError"],ans:0,
+ why:"名字还没绑定就使用 → NameError。Python 执行到 def 那一行才创建函数对象。"},
+{id:"q80",ch:12,topic:"12 def 的语法",sec:"§12",type:"choice",
+ q:"下面哪个函数定义写法是正确的？",
+ opts:["def greet() {print('hi')}","def greet(): print('hi')","function greet(): print('hi')","def greet() -> print('hi')"],ans:1,
+ why:"`def 名字(参数):` 后面跟缩进的函数体；单行写法也必须有冒号。其他几种都不是 Python 语法。"},
+
+/* ---------- Ch13 报错类型 ---------- */
+{id:"q81",ch:13,topic:"13.1 三类错误的分辨",sec:"§13.1",type:"choice",
+ q:"哪类错误是“程序能跑完、完全不报错，但结果不对”？",
+ opts:["Syntax error","Runtime error","Logic error","IndentationError"],ans:2,
+ why:"逻辑错误最难查，只能靠读代码、打日志、拿测试数据比对。"},
+{id:"q82",ch:13,topic:"13.2 ValueError",sec:"§13.2",type:"choice",
+ q:"`int('abc')` 抛什么异常？",
+ opts:["TypeError","ValueError","NameError","SyntaxError"],ans:1,
+ why:"类型对（是字符串）、值不对（不是数字）→ ValueError。"},
+{id:"q83",ch:13,topic:"13.2 IndexError",sec:"§13.2",type:"choice",
+ q:"`print([1, 2, 3][5])` 抛什么异常？",
+ opts:["KeyError","IndexError","ValueError","TypeError"],ans:1,
+ why:"列表下标越界是 IndexError。"},
+{id:"q84",ch:13,topic:"13.2 ZeroDivisionError",sec:"§13.2",type:"choice",
+ q:"`print(10 / 0)` 抛什么异常？",
+ opts:["ZeroDivisionError","ValueError","TypeError","什么都不抛"],ans:0,
+ why:"除以 0 就是 ZeroDivisionError。"},
+{id:"q85",ch:13,topic:"13.1 语法错误长什么样",sec:"§13.1",type:"choice",
+ q:"下面哪一句是语法错误（程序根本跑不起来）？",
+ opts:["if x = 5:","int('abc')","[1, 2][5]","1 / 0"],ans:0,
+ why:"赋值语句不能写在 if 条件里，这是 SyntaxError；其余三个都是运行时才崩的错误。"},
+/* ---------- Ch14 现代 Python 实用新语法 ---------- */
+{id:"q86",ch:14,topic:"14.1 海象运算符 := 的括号",sec:"§14.1",type:"choice",ver:"3.8+",
+ q:"想“先把 len(a) 存进 n，再和 3 比较”，下面哪句是对的？",
+ opts:["if n := len(a) > 3:","if (n := len(a)) > 3:","if n = len(a) > 3:","if len(a) := n > 3:"],ans:1,
+ why:"海象运算符优先级很低：不加括号时整个 `len(a) > 3` 先算成 True，n 变成 True——不报错但结果错。`n = ...` 写在 if 里是语法错误。"},
+{id:"q87",ch:14,topic:"14.1 海象运算符实战",sec:"§14.1",type:"fill",ver:"3.8+",
+ q:"下面代码输出什么？",code:`nums = [3, 7, 12, 5]
+if (big := max(nums)) > 10:
+    print(big)`,a:["12"],
+ why:"一行里既存了变量又做了判断，省掉先 `big = max(nums)` 再 `if big > 10` 的两行。"},
+{id:"q88",ch:14,topic:"14.2 f-string 的 = 调试写法",sec:"§14.2",type:"fill",ver:"3.8+",
+ q:"下面代码输出什么？",code:`x = 10
+y = 20
+print(f'{x + y = }')`,a:["x + y = 30"],
+ why:"f-string 里写 `=` 会把“表达式本身”和结果一起打印，调试时不用再手写 'x+y=' 这种标签。"},
+{id:"q89",ch:14,topic:"14.3 用 | 合并字典",sec:"§14.3",type:"choice",ver:"3.9+",
+ q:"下面代码输出什么？",code:`d1 = {'a': 1}
+d2 = {'b': 2, 'a': 9}
+print(d1 | d2)`,
+ opts:["{'a': 1, 'b': 2}","{'a': 9, 'b': 2}","{'a': 1, 'a': 9, 'b': 2}","TypeError"],ans:1,
+ why:"右边的同名键覆盖左边，所以 'a' 变成 9。`d1 |= d2` 是原地版本，比 `{**d1, **d2}` 更清楚。"},
+{id:"q90",ch:14,topic:"14.4 removeprefix / removesuffix",sec:"§14.4",type:"fill",ver:"3.9+",
+ q:"下面这行输出什么？",code:`print('test_file.py'.removesuffix('.py'))`,a:["test_file"],
+ why:"removesuffix 去掉结尾的固定串，removeprefix 去掉开头的。比 `[:-3]` 或 replace 安全，不会误伤中间部分。"},
+{id:"q91",ch:14,topic:"14.5 enumerate 同时拿下标和元素",sec:"§14.5",type:"choice",ver:"3.0+",
+ q:"第一次循环打印出什么？",code:`for i, c in enumerate(['a', 'b'], start=1):
+    print(i, c)`,
+ opts:["0 a","1 a","1 b","a 1"],ans:1,
+ why:"enumerate 同时给下标和元素；`start=1` 让编号从 1 开始，做排名、报表很常用。"},
+{id:"q92",ch:14,topic:"14.6 zip 配对生成字典",sec:"§14.6",type:"fill",
+ q:"下面这行输出什么？",code:`print(dict(zip(['a', 'b'], [90, 80])))`,
+ a:["{'a': 90, 'b': 80}"],
+ why:"zip 把两个序列“拉链式”配对成元组，dict() 直接把配对变成字典。"},
+{id:"q93",ch:14,topic:"14.7 星号解包",sec:"§14.7",type:"fill",
+ q:"下面代码输出什么？",code:`first, *rest = [1, 2, 3, 4]
+print(first, rest)`,a:["1 [2, 3, 4]"],
+ why:"`*rest` 收走剩下所有元素，比 `lst[0]` 加 `lst[1:]` 更直观。"},
+{id:"q94",ch:14,topic:"14.6 zip(strict=True) 防丢数据",sec:"§14.6",type:"choice",ver:"3.10+",
+ q:"`list(zip([1, 2, 3], 'ab', strict=True))` 会怎样？",
+ opts:["[(1, 'a'), (2, 'b')]","[(1, 'a'), (2, 'b'), (3, None)]","ValueError","TypeError"],ans:2,
+ why:"默认 zip 按短的截断、悄悄丢数据；`strict=True` 长度不一致直接 ValueError，更安全。"},
+{id:"q95",ch:14,topic:"14.8 match 字面量分支",sec:"§14.8",type:"choice",ver:"3.10+",
+ q:"下面代码输出什么？",code:`cmd = 'go'
+match cmd:
+    case 'go' | 'run':
+        print('前进')
+    case 'stop':
+        print('停')
+    case _:
+        print('未知')`,
+ opts:["前进","停","未知","SyntaxError"],ans:0,
+ why:"`|` 表示“或”，匹配任一分支就执行；`case _` 是兜底（类似 default），要放在最后。"},
+{id:"q96",ch:14,topic:"14.8 match 序列模式",sec:"§14.8",type:"fill",ver:"3.10+",
+ q:"下面代码输出什么？",code:`point = (0, 5)
+match point:
+    case (0, 0):
+        print('原点')
+    case (0, y):
+        print(f'在 y 轴上，y={y}')
+    case _:
+        print('其它')`,a:["在 y 轴上，y=5"],
+ why:"`case (0, y)` 会把第二个元素绑到 y 上，分支里就能直接用——用 if 写要先判断长度再逐个取，麻烦得多。"},
+{id:"q97",ch:14,topic:"14.8 match 字典模式",sec:"§14.8",type:"fill",ver:"3.10+",
+ q:"下面代码输出什么？",code:`msg = {'type': 'add', 'x': 1, 'y': 2}
+match msg:
+    case {'type': 'add', 'x': a, 'y': b}:
+        print(a + b)
+    case _:
+        print('skip')`,a:["3"],
+ why:"字典模式按键匹配，同时把值绑到变量，处理 JSON、配置这类数据特别顺手。"},
+{id:"q98",ch:14,topic:"14.8 match 守卫 guard",sec:"§14.8",type:"choice",ver:"3.10+",
+ q:"下面代码输出什么？",code:`age = 15
+match age:
+    case n if n >= 18:
+        print('adult')
+    case _:
+        print('minor')`,
+ opts:["adult","minor","SyntaxError","什么都不输出"],ans:1,
+ why:"`case ... if ...` 是守卫（guard），条件不成立就继续试下一个 case。"},
+{id:"q99",ch:14,topic:"14.9 sorted 的 key 参数",sec:"§14.9",type:"choice",
+ q:"下面这行输出什么？",code:`print(sorted(['ccc', 'a', 'bb'], key=len))`,
+ opts:["['a', 'bb', 'ccc']","['ccc', 'bb', 'a']","['a', 'ccc', 'bb']","TypeError"],ans:0,
+ why:"`key=len` 表示按长度排序，不写 key 才是按字典序。key 还能是 `str.lower`、lambda 等。"},
+{id:"q100",ch:14,topic:"14.10 星号把列表摊成参数",sec:"§14.10",type:"fill",
+ q:"下面这行输出什么？",code:`print(*[1, 2, 3], sep='-')`,a:["1-2-3"],
+ why:"`*lst` 把列表摊开成多个参数，等价于 `print(1, 2, 3, sep='-')`。"},
+{id:"q101",ch:14,topic:"14.11 any 与 all",sec:"§14.11",type:"choice",
+ q:"下面这行输出什么？",code:`print(any([0, '', 3]), all([1, 'a', 0]))`,
+ opts:["True False","True True","False False","False True"],ans:0,
+ why:"any 有一个真就 True；all 必须全真。0、空串、空列表、None、False 都算假。"},
+{id:"q102",ch:14,topic:"14.12 类型标注不参与运行",sec:"§14.12",type:"choice",
+ q:"`def add(a: int, b: int) -> int:` 里的 `-> int` 表示什么？",
+ opts:["强制返回值必须是 int，否则运行时报错","返回值类型提示，解释器运行时不检查","把函数声明成整数","必须 import typing 才能这样写"],ans:1,
+ why:"类型标注只是给人和工具（IDE、mypy）看的提示，运行时不会因为类型不对而报错。`list[int]` 这种写法 3.9+ 可用。"},
+{id:"q103",ch:14,topic:"14.13 itertools.batched 分批",sec:"§14.13",type:"choice",ver:"3.12+",
+ q:"（已 `from itertools import batched`）`list(batched('ABCDEFG', 3))` 的结果是？",
+ opts:["[('A', 'B', 'C'), ('D', 'E', 'F'), ('G',)]","[('ABC'), ('DEF'), ('G')]","['ABC', 'DEF', 'G']","报错：长度不能被 3 整除"],ans:0,
+ why:"每 3 个一批，最后不足 3 个就单独成批，不会丢元素。"},
+];
+
+/* ============================================================
+   工具
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const ESC={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>ESC[c]);
+const fmt=s=>esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');
+const norm=s=>String(s).trim().toLowerCase()
+  .replace(/[\u201c\u201d\u300c\u300d]/g,'"').replace(/[\u2018\u2019]/g,"'")
+  .replace(/[\uff0c\u3001]/g,',').replace(/\uff1a/g,':').replace(/\uff1b/g,';')
+  .replace(/\uff08/g,'(').replace(/\uff09/g,')').replace(/\u3010/g,'[').replace(/\u3011/g,']')
+  .replace(/[\s\u00a0]+/g,'')
+  .replace(/^['"]+|['"]+$/g,'')
+  .replace(/\u3002+$/,'');
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+function sampleSpread(pool,n){
+  const by={};
+  pool.forEach(q=>{(by[q.ch]=by[q.ch]||[]).push(q);});
+  let out=shuffle(Object.keys(by).map(k=>shuffle(by[k])[0])).slice(0,n);
+  if(out.length<n){
+    const rest=shuffle(pool.filter(q=>out.indexOf(q)<0));
+    out=out.concat(rest.slice(0,n-out.length));
+  }
+  return shuffle(out);
+}
+const LS='pyquiz.v1';
+function readLast(){try{return JSON.parse(localStorage.getItem(LS)||'null')}catch(e){return null}}
+function saveLast(v){try{localStorage.setItem(LS,JSON.stringify(v))}catch(e){}}
+let last=readLast();
+let sel=new Set(Object.keys(CH).map(Number));
+let st=null;
+
+/* ---------- 断点续测 ---------- */
+const SS='pyquiz.v1.session';
+function saveSession(){
+  if(!st)return;
+  try{
+    const done=Math.min(st.res.length,st.pool.length);
+    if(done>=st.pool.length){localStorage.removeItem(SS);return;}
+    localStorage.setItem(SS,JSON.stringify({
+      mode:st.mode,elapsed:Date.now()-st.t0,
+      pool:st.pool.map(q=>q.id),
+      res:st.res.slice(0,done).map(r=>({id:r.q.id,ok:r.ok,skip:r.skip,given:r.given}))
+    }));
+  }catch(e){}
+}
+function readSession(){
+  try{
+    const raw=localStorage.getItem(SS);
+    if(!raw)return null;
+    const o=JSON.parse(raw);
+    if(!o||!Array.isArray(o.pool))return null;
+    const pool=o.pool.map(id=>BANK.find(q=>q.id===id)).filter(Boolean);
+    if(!pool.length)return null;
+    const res=(o.res||[]).map(r=>{
+      const q=BANK.find(x=>x.id===r.id);
+      return q?{q,ok:!!r.ok,skip:!!r.skip,given:r.given||''}:null;
+    }).filter(Boolean);
+    if(res.length>=pool.length)return null;
+    return {mode:o.mode||'full',elapsed:o.elapsed||0,pool,res};
+  }catch(e){return null;}
+}
+function clearSession(){try{localStorage.removeItem(SS)}catch(e){}}
+function renderResume(){
+  const bar=$('#resumeBar');
+  if(!bar)return;
+  const s=readSession();
+  if(!s){bar.classList.add('hide');return;}
+  bar.classList.remove('hide');
+  $('#rb-pos').textContent=(s.res.length+1)+' / '+s.pool.length;
+  $('#rb-ok').textContent=s.res.filter(r=>r.ok).length;
+}
+function resume(){
+  const s=readSession();
+  if(!s){toast('没有可恢复的进度');renderResume();return;}
+  st={pool:s.pool,i:s.res.length,t0:Date.now()-(s.elapsed||0),mode:s.mode,res:s.res.slice()};
+  $('#homeView').classList.add('hide');
+  $('#resultView').classList.add('hide');
+  $('#ov').classList.add('show');
+  renderQ();
+}
+
+/* ============================================================
+   首页
+   ============================================================ */
+function poolNow(){return BANK.filter(q=>sel.has(q.ch));}
+function countCh(n){return BANK.filter(q=>q.ch===n).length;}
+
+function renderChips(){
+  $('#chips').innerHTML=Object.keys(CH).map(k=>{
+    const n=+k;
+    return `<button class="chip${sel.has(n)?' on':''}" data-ch="${n}">${n}. ${esc(CH[n].short)}<i>${countCh(n)}</i></button>`;
+  }).join('');
+}
+
+function renderKmap(){
+  $('#kmap').innerHTML=Object.keys(CH).map(k=>{
+    const n=+k,c=CH[n];
+    return `<details class="kcard">
+      <summary><span class="cn">Ch ${n}</span><span class="kt">${esc(c.name)}</span><span class="kc">${countCh(n)} 题</span><i class="chev"></i></summary>
+      <div class="kbody">
+        <ul>${c.points.map(p=>`<li>${fmt(p)}</li>`).join('')}</ul>
+        <p class="pit">⚠️ ${fmt(c.pit)}</p>
+        <button class="btn ghost small" data-practice="${n}">只练这一章 →</button>
+      </div>
+    </details>`;
+  }).join('');
+}
+
+function wrongPool(){
+  const w=new Set((last&&last.wrong)||[]);
+  return BANK.filter(q=>w.has(q.id));
+}
+
+function updateStart(){
+  const n=poolNow().length;
+  const b=$('#startBtn');
+  b.textContent=n?`开始测评 · ${n} 题`:'先选几章';
+  b.disabled=!n;
+  $('#quickBtn').disabled=!n;
+  const w=wrongPool().filter(q=>sel.has(q.ch)).length;
+  const wb=$('#wrongBtn');
+  wb.disabled=!w;
+  wb.textContent=w?`只练错题 · ${w}`:'只练错题';
+  renderResume();
+}
+
+function renderLast(){
+  const el=$('#laststat');
+  if(!last){el.textContent='还没有记录，做完一次就会显示薄弱点';return;}
+  const d=new Date(last.ts);
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  el.textContent=`上次：${last.right}/${last.total}（${last.pct}%）· ${d.getMonth()+1}月${d.getDate()}日 ${hm}`;
+}
+
+function renderHome(){
+  renderChips();renderKmap();renderLast();updateStart();
+  $('#s-total').textContent=BANK.length;
+  $('#s-ch').textContent=Object.keys(CH).length;
+  $('#hstat').textContent=`${BANK.length} 题 · ${Object.keys(CH).length} 章 · 选择 ${BANK.filter(q=>q.type==='choice').length} + 填空 ${BANK.filter(q=>q.type==='fill').length}`;
+  renderStoreState();
+}
+
+function storageOK(){
+  try{localStorage.setItem('__pyq_probe','1');localStorage.removeItem('__pyq_probe');return true;}
+  catch(e){return false;}
+}
+function renderStoreState(){
+  const el=$('#storeState');
+  if(!el)return;
+  const ok=storageOK();
+  const local=/^file:/i.test(location.protocol);
+  el.style.color=ok?'#16a34a':'#dc2626';
+  if(ok)el.textContent='进度保存：可用 ✅ 关掉页面再打开，点「继续上次」就能接着做';
+  else el.textContent=local
+    ? '⚠️ 当前是用本地文件打开的，这个浏览器不允许本地文件存进度。挂个网址（https）打开即可恢复。'
+    : '⚠️ 当前浏览器禁止了本地存储（可能是无痕模式），进度无法保存。';
+}
+
+/* ============================================================
+   测评流程
+   ============================================================ */
+function start(mode,only){
+  let pool=(only!=null)?BANK.filter(q=>q.ch===only):poolNow();
+  if(mode==='quick')pool=sampleSpread(pool,Math.min(20,pool.length));
+  if(mode==='wrong'){
+    const w=new Set((last&&last.wrong)||[]);
+    pool=pool.filter(q=>w.has(q.id));
+  }
+  if(!pool.length){toast('这里没有题目，先选几章');return;}
+  st={pool,i:0,res:[],t0:Date.now(),mode};
+  saveSession();
+  $('#homeView').classList.add('hide');
+  $('#resultView').classList.add('hide');
+  $('#ov').classList.add('show');
+  renderQ();
+}
+
+function renderQ(){
+  const q=st.pool[st.i],c=CH[q.ch];
+  st.picked=null;st.answered=false;
+  const pct=Math.round(st.i/st.pool.length*100);
+  const opts=q.type==='choice'
+    ?`<div class="opts">${q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><span class="k">${'ABCD'[i]}</span><span class="t">${fmt(o)}</span></div>`).join('')}</div>`
+    :`<div class="fillwrap"><input id="ans" class="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(q.ph||'填写输出结果或关键字…')}"><p class="fhint">不区分大小写与空格；照屏幕上的样子写输出</p></div>`;
+  $('#modal').innerHTML=`
+    <div class="m-head">
+      <div class="m-crumb"><b>第 ${st.i+1} / ${st.pool.length} 题</b><span>·</span><span>Ch ${q.ch} ${esc(c.short)}</span></div>
+      <button class="x" id="quit" title="退出（Esc）">✕</button>
+    </div>
+    <div class="pbar"><i style="width:${pct}%"></i></div>
+    <div class="m-body">
+      <div class="qmeta"><span class="badge ${q.type}">${q.type==='choice'?'单选题':'填空题'}</span><span class="topic">${esc(q.topic)}</span>${q.ver?`<span class="ver">Python ${esc(q.ver)}</span>`:''}</div>
+      <p class="qtext">${fmt(q.q)}</p>
+      ${q.code?`<pre class="code"><code>${esc(q.code)}</code></pre>`:''}
+      ${opts}
+      <div id="fb"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn subtle" id="skip">我不会</button>
+      <button class="btn primary" id="submit">确认作答</button>
+    </div>`;
+  bind();
+  if(q.type==='fill')setTimeout(()=>{const el=$('#ans');if(el)el.focus();},60);
+  $('#modal').scrollTop=0;
+}
+
+function bind(){
+  $$('#modal .opt').forEach(el=>el.addEventListener('click',()=>pick(+el.dataset.i)));
+  const s=$('#submit'),k=$('#skip'),x=$('#quit');
+  s.addEventListener('click',()=>st.answered?next():grade(false));
+  k.addEventListener('click',()=>st.answered?next():grade(true));
+  x.addEventListener('click',quit);
+}
+
+function pick(i){
+  if(!st||st.answered)return;
+  st.picked=i;
+  $$('#modal .opt').forEach((el,k)=>el.classList.toggle('sel',k===i));
+}
+
+function grade(skip){
+  if(!st||st.answered)return;
+  const q=st.pool[st.i];
+  let ok=false,given='';
+  if(!skip){
+    if(q.type==='choice'){
+      if(st.picked==null){shake();toast('先选一项，或点「我不会」');return;}
+      given=q.opts[st.picked];
+      ok=st.picked===q.ans;
+    }else{
+      const inp=$('#ans');
+      given=inp.value;
+      if(!given.trim()){inp.classList.add('wrong');inp.focus();toast('写点什么，或点「我不会」');return;}
+      ok=q.a.some(x=>norm(x)===norm(given));
+    }
+  }
+  st.res.push({q,ok,skip,given});
+  st.answered=true;
+  saveSession();
+  paint(q,ok,skip,given);
+}
+
+function paint(q,ok,skip,given){
+  if(q.type==='choice'){
+    $$('#modal .opt').forEach((el,k)=>{
+      el.classList.add('lock');el.classList.remove('sel');
+      if(k===q.ans)el.classList.add('ok');
+      else if(k===st.picked)el.classList.add('bad');
+      else el.classList.add('dim');
+    });
+  }else{
+    const inp=$('#ans');
+    inp.disabled=true;
+    inp.classList.add(ok?'right':'wrong');
+  }
+  const correct=q.type==='choice'?q.opts[q.ans]:q.a[0];
+  const lastQ=st.i===st.pool.length-1;
+  $('#fb').innerHTML=`<div class="fb ${ok?'ok':(skip?'neutral':'bad')}">
+    <div class="fb-h">${ok?'✓ 答对了':(skip?'— 这题先放过':'✗ 答错了')}</div>
+    <div class="fb-row"><b>正确答案</b><span>${esc(correct)}</span></div>
+    ${(!ok&&!skip&&q.type==='fill')?`<div class="fb-row"><b>你的答案</b><span>${esc(given)}</span></div>`:''}
+    <div class="fb-why">${fmt(q.why)}</div>
+    <div class="fb-src">📖 笔记 ${esc(q.sec)}　·　${esc(q.topic)}</div>
+  </div>`;
+  $('#skip').style.display='none';
+  $('#submit').textContent=lastQ?'查看测评报告 →':'下一题 →';
+  const body=$('#modal .m-body');
+  body.scrollTo({top:body.scrollHeight,behavior:'smooth'});
+}
+
+function next(){
+  if(st.i<st.pool.length-1){st.i++;renderQ();}
+  else finish();
+}
+
+function finish(){
+  const secs=Math.round((Date.now()-st.t0)/1000);
+  const total=st.res.length,right=st.res.filter(r=>r.ok).length;
+  const pct=total?Math.round(right/total*100):0;
+  last={ts:Date.now(),total,right,pct,secs,wrong:st.res.filter(r=>!r.ok).map(r=>r.q.id)};
+  saveLast(last);
+  clearSession();
+  $('#ov').classList.remove('show');
+  $('#homeView').classList.add('hide');
+  $('#resultView').classList.remove('hide');
+  renderResult(right,total,pct,secs);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============================================================
+   结果报告
+   ============================================================ */
+function pctColor(p){return p>=85?'#16a34a':p>=60?'#f59e0b':'#dc2626';}
+
+function renderResult(right,total,pct,secs){
+  const by={};
+  st.res.forEach(r=>{
+    const n=r.q.ch;
+    by[n]=by[n]||{t:0,c:0,bad:[]};
+    by[n].t++;r.ok?by[n].c++:by[n].bad.push(r.q);
+  });
+
+  const verdict=pct>=90?'很稳，细节也抓得住':pct>=75?'主干懂了，丢分集中在坑上':pct>=55?'半懂：概念有印象，写起来就错':'建议先按清单回看，再测一次';
+  let weakest=null;
+  Object.keys(by).forEach(k=>{
+    const s=by[k];
+    if(s.t>=2&&(!weakest||s.c/s.t<weakest.rate))weakest={n:+k,rate:s.c/s.t};
+  });
+  const mm=Math.floor(secs/60),ss=secs%60;
+
+  const chRows=Object.keys(CH).map(k=>{
+    const n=+k,s=by[n];if(!s)return '';
+    const p=Math.round(s.c/s.t*100),c=pctColor(p);
+    const tags=[...new Set(s.bad.map(q=>q.topic))];
+    return `<div class="crow">
+      <div class="crow-h"><span>${n}. ${esc(CH[n].short)}</span><b style="color:${c}">${s.c}/${s.t} · ${p}%</b></div>
+      <div class="bar"><i style="width:${p}%;background:${c}"></i></div>
+      ${tags.length?`<div class="ctags">${tags.map(t=>`<span>${fmt(t)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+
+  const seen=new Set(),groups={};
+  st.res.filter(r=>!r.ok).forEach(r=>{
+    if(seen.has(r.q.topic))return;seen.add(r.q.topic);
+    (groups[r.q.ch]=groups[r.q.ch]||[]).push(r.q);
+  });
+  const weakHtml=Object.keys(groups).length
+    ?Object.keys(groups).map(k=>{
+      const n=+k;
+      return `<div class="wk"><h4>Ch ${n} · ${esc(CH[n].name)}</h4>
+        <ul>${groups[k].map(q=>`<li>${fmt(q.topic)}<span>${esc(q.sec)}</span></li>`).join('')}</ul>
+        <p>${fmt(CH[n].points.slice(0,2).join('；'))}</p></div>`;
+    }).join('')
+    :'<p class="muted">这次全部答对，没有需要回看的点 ✅</p>';
+
+  const detail=st.res.map((r,i)=>{
+    const q=r.q;
+    return `<div class="drow ${r.ok?'ok':'bad'}">
+      <div class="dh"><span>${i+1}. ${esc(q.topic)}</span><i class="${r.ok?'y':'n'}">${r.ok?'✓':'✗'}</i></div>
+      <div class="dq">${fmt(q.q)}${q.code?`<pre class="code sm"><code>${esc(q.code)}</code></pre>`:''}</div>
+      <div class="da">你的答案：${esc(r.skip?'（点了我不会）':(r.given||'—'))}　｜　正确：${esc(q.type==='choice'?q.opts[q.ans]:q.a[0])}</div>
+      <div class="dw">${fmt(q.why)}</div>
+    </div>`;
+  }).join('');
+
+  const wcount=last.wrong.length;
+  $('#resultView').innerHTML=`
+    <div class="res-hero">
+      <div class="ring" style="--p:${pct};--c:${pctColor(pct)}"><div class="ring-in"><b>${pct}</b><span>%</span></div></div>
+      <div>
+        <h2>${verdict}</h2>
+        <p>答对 <b>${right}</b> / ${total} 题　·　用时 ${mm} 分 ${String(ss).padStart(2,'0')} 秒</p>
+        <p class="muted">${weakest?`最需要补：第 ${weakest.n} 章 ${esc(CH[weakest.n].name)}（${Math.round(weakest.rate*100)}%）`:'每章都覆盖到了'}</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><div class="panel-h"><h3>章节掌握度</h3><span class="muted">绿 ≥85% · 黄 ≥60% · 红 &lt;60%</span></div>${chRows}</div>
+      <div class="panel"><div class="panel-h"><h3>需要回看</h3><span class="muted">按章归类的具体考点</span></div>${weakHtml}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><h3>全部题目明细</h3><span class="muted">含解析与笔记出处</span></div>
+      <details class="kcard"><summary><span class="kt">展开 ${total} 道题的作答记录</span><i class="chev"></i></summary><div class="kbody">${detail}</div></details>
+    </div>
+    <div class="startrow" style="margin-bottom:40px">
+      ${wcount?`<button class="btn primary" onclick="retryWrong()">只练错的 ${wcount} 题</button>`:''}
+      <button class="btn ghost" onclick="start('full')">重新测一次</button>
+      <button class="btn ghost" onclick="exportMd()">导出报告 (.md)</button>
+      <button class="btn subtle" onclick="goHome()">回到首页</button>
+    </div>`;
+}
+
+function retryWrong(){
+  const w=new Set((last&&last.wrong)||[]);
+  const pool=BANK.filter(q=>w.has(q.id));
+  if(!pool.length){toast('没有错题');return;}
+  st={pool,i:0,res:[],t0:Date.now(),mode:'wrong'};
+  saveSession();
+  $('#resultView').classList.add('hide');
+  $('#ov').classList.add('show');
+  renderQ();
+}
+
+function goHome(){
+  $('#resultView').classList.add('hide');
+  $('#homeView').classList.remove('hide');
+  renderLast();updateStart();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function exportMd(){
+  if(!st)return;
+  const total=st.res.length,right=st.res.filter(r=>r.ok).length;
+  const d=new Date();
+  const L=[`# Python 摸底测评报告`,` `,
+    `- 时间：${d.toLocaleString('zh-CN')}`,
+    `- 成绩：${right} / ${total}（${total?Math.round(right/total*100):0}%）`,
+    `- 模式：${{full:'完整测评',quick:'随机 20 题',wrong:'错题重练'}[st.mode]||'测评'}`,` `,
+    `## 错题与考点`];
+  const wrong=st.res.filter(r=>!r.ok);
+  if(!wrong.length)L.push('全部答对。');
+  wrong.forEach((r,i)=>{
+    const q=r.q;
+    L.push(`${i+1}. **${q.topic}**（${q.sec}）`);
+    L.push('   - 题目：'+q.q.replace(/\n/g,' '));
+    if(q.code)L.push('   ```python\n'+q.code.split('\n').map(l=>'   '+l).join('\n')+'\n   ```');
+    L.push(`   - 你答：${r.skip?'（我不会）':(r.given||'—')}　正确：${q.type==='choice'?q.opts[q.ans]:q.a[0]}`);
+    L.push(`   - 解析：${q.why}`);
+  });
+  L.push('','## 逐题记录');
+  st.res.forEach((r,i)=>{
+    L.push(`${i+1}. ${r.ok?'✅':'❌'} ${r.q.topic} — ${r.q.sec}`);
+  });
+  const blob=new Blob([L.join('\n')],{type:'text/markdown;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`python-测评报告-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.md`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  toast('报告已下载');
+}
+
+/* ============================================================
+   交互杂项
+   ============================================================ */
+function shake(){
+  const m=$('#modal');
+  m.classList.remove('shake');void m.offsetWidth;m.classList.add('shake');
+}
+let toastT;
+function toast(msg){
+  const t=$('#toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2000);
+}
+function quit(){
+  if(!st)return;
+  if(st.res.length>=st.pool.length){finish();return;}
+  saveSession();
+  if(!confirm('退出本次测评？已答的题目已保存，下次打开可以接着做。'))return;
+  $('#ov').classList.remove('show');
+  st=null;goHome();
+}
+
+document.addEventListener('click',e=>{
+  const chip=e.target.closest('[data-ch]');
+  if(chip){
+    const n=+chip.dataset.ch;
+    sel.has(n)?sel.delete(n):sel.add(n);
+    renderChips();updateStart();return;
+  }
+  const pr=e.target.closest('[data-practice]');
+  if(pr){start('full',+pr.dataset.practice);return;}
+  if(e.target.id==='allOn'){sel=new Set(Object.keys(CH).map(Number));renderChips();updateStart();return;}
+  if(e.target.id==='allOff'){sel=new Set();renderChips();updateStart();return;}
+  if(e.target.id==='resumeBtn'){resume();return;}
+  if(e.target.id==='discardBtn'){clearSession();renderResume();toast('已丢弃上次进度');return;}
+  if(e.target.id==='startBtn'){start('full');return;}
+  if(e.target.id==='quickBtn'){start('quick');return;}
+  if(e.target.id==='wrongBtn'){start('wrong');return;}
+});
+
+document.addEventListener('keydown',e=>{
+  if(!$('#ov').classList.contains('show')||!st)return;
+  if(e.key==='Escape'){e.preventDefault();quit();return;}
+  const q=st.pool[st.i];
+  if(!q)return;
+  if(st.answered){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();next();}
+    return;
+  }
+  if(e.key==='Enter'){e.preventDefault();grade(false);return;}
+  if(q.type==='choice'){
+    const k=e.key.toUpperCase();
+    let idx=-1;
+    if(k.length===1&&k>='1'&&k<='9')idx=+k-1;
+    else if(k.length===1&&'ABCD'.indexOf(k)>=0)idx='ABCD'.indexOf(k);
+    if(idx>=0&&idx<q.opts.length){e.preventDefault();pick(idx);}
+  }
+});
+
+window.addEventListener('beforeunload',()=>{if(st)saveSession();});
+window.addEventListener('pagehide',()=>{if(st)saveSession();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&st)saveSession();});
+
+renderHome();
+</script>
+</body>
+</html>
