@@ -253,6 +253,8 @@ pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
 .blink{color:#4338ca;text-decoration:none;border-bottom:1px dotted #a5b4fc}
 .blink:hover{border-bottom-style:solid}
 .refmodal{width:min(680px,100%)}
+.codebox{height:132px;resize:vertical;line-height:1.7;white-space:pre-wrap;word-break:break-all;font-size:12.5px;color:#1b2033}
+#codeOv{background:rgba(23,27,45,.62)}
 #refOv{background:rgba(23,27,45,.62)}
 .hcol{min-width:0}
 .hcol h1{margin:0}
@@ -282,6 +284,7 @@ pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
 </div>
 <div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
 <div class="overlay" id="refOv"><div class="modal refmodal"><div id="refBody"></div></div></div>
+<div class="overlay" id="codeOv"><div class="modal refmodal"><div id="codeBody"></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -3594,6 +3597,9 @@ function renderHome() {
       <span class="laststat" id="laststat"></span>
     </div>
     <p class="laststat" id="storeState" style="margin:10px 2px 0"></p>
+    <div class="startrow" style="margin-top:8px">
+      <button class="btn subtle small" id="shareBtn">📋 复制成绩码（发给老师看薄弱点）</button>
+    </div>
   </div>
 
   <div class="panel">
@@ -3651,6 +3657,8 @@ function updateStart() {
   wb.disabled = !w;
   wb.textContent = w ? `只练错题 · ${w}` : '只练错题';
   renderResume();
+  const sb = $('#shareBtn');
+  if (sb) sb.style.display = readLS(LS_LAST(cur)) ? '' : 'none';
 }
 
 function renderResume() {
@@ -3850,8 +3858,14 @@ function finish() {
   const total = st.res.length;
   const right = st.res.reduce((a, r) => a + r.score, 0);
   const pct = total ? Math.round(right / total * 100) : 0;
+  const chStat = {};
+  st.res.forEach(r => {
+    const n = r.q.ch;
+    chStat[n] = chStat[n] || [0, 0];
+    chStat[n][0] += r.score; chStat[n][1] += 1;
+  });
   const rec = {
-    ts: Date.now(), total, right: Math.round(right * 10) / 10, pct, secs,
+    ts: Date.now(), total, right: Math.round(right * 10) / 10, pct, secs, ch: chStat,
     wrong: st.res.filter(r => r.score < 1).map(r => r.q.id)
   };
   writeLS(LS_LAST(cur), rec);
@@ -3944,11 +3958,72 @@ function renderResult(bank, res, secs) {
     </div>
     <div class="startrow" style="margin-bottom:40px">
       ${wcount ? `<button class="btn primary" onclick="retryWrong()">只练错的 ${wcount} 题</button>` : ''}
+      <button class="btn ghost" onclick="shareCode()">📋 复制成绩码</button>
       <button class="btn ghost" onclick="start('full')">重新测一次</button>
       <button class="btn ghost" onclick="exportMd()">导出报告 (.md)</button>
       <button class="btn subtle" onclick="goHome()">回到首页</button>
     </div>`;
 }
+
+/* ---------- 成绩码 ---------- */
+function buildCode() {
+  let res = null, rec = null;
+  if (st && st.bank === cur && st.res && st.res.length) res = st.res;
+  else rec = readLS(LS_LAST(cur));
+  if (!res && !rec) return null;
+
+  let total, right, pct, chs = {}, wrong = [];
+  if (res) {
+    total = res.length;
+    right = Math.round(res.reduce((a, r) => a + r.score, 0) * 10) / 10;
+    pct = total ? Math.round(right / total * 100) : 0;
+    res.forEach(r => {
+      const n = r.q.ch;
+      chs[n] = chs[n] || [0, 0];
+      chs[n][0] += r.score; chs[n][1] += 1;
+      if (r.score < 1) wrong.push(r.q.id);
+    });
+  } else {
+    total = rec.total; right = rec.right; pct = rec.pct; chs = rec.ch || {}; wrong = rec.wrong || [];
+  }
+  const chTxt = Object.keys(chs).sort((a, b) => a - b)
+    .map(k => `${k}:${Math.round(chs[k][0] * 10) / 10}/${chs[k][1]}`).join(',');
+  return `PYC1|${cur}|${total}|${right}|${pct}|${chTxt}|${wrong.slice(0, 80).join(',')}`;
+}
+
+function shareCode() {
+  const code = buildCode();
+  if (!code) { toast('还没有成绩，先做一轮测评'); return; }
+  $('#codeBody').innerHTML = `
+    <div class="m-head">
+      <div class="m-crumb"><b>成绩码</b><span>·</span><span>复制后发给我</span></div>
+      <button class="x" id="codeClose">✕</button>
+    </div>
+    <div class="m-body">
+      <p class="muted" style="margin:0 0 10px">长按下面这段文字 → 全选 → 复制。用微信发**文字**就行，不用传文件。</p>
+      <textarea id="codeTa" readonly class="ans codebox">${esc(code)}</textarea>
+      <div class="startrow" style="margin-top:12px">
+        <button class="btn primary" id="codeCopy">复制</button>
+        <span class="muted" id="codeTip"></span>
+      </div>
+    </div>`;
+  $('#codeOv').classList.add('show');
+  const ta = $('#codeTa');
+  setTimeout(() => { ta.focus(); ta.select(); }, 60);
+  $('#codeClose').addEventListener('click', closeCode);
+  $('#codeCopy').addEventListener('click', async () => {
+    ta.focus(); ta.select();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(code);
+        $('#codeTip').textContent = '已复制 ✓ 直接粘到微信';
+      } else throw new Error('no api');
+    } catch (e) {
+      $('#codeTip').textContent = '已全选，按 Ctrl+C 或长按复制';
+    }
+  });
+}
+function closeCode() { $('#codeOv').classList.remove('show'); }
 
 function retryWrong() {
   const l = readLS(LS_LAST(cur));
@@ -4063,6 +4138,7 @@ document.addEventListener('click', e => {
   if (e.target.id === 'startBtn') { start('full'); return; }
   if (e.target.id === 'quickBtn') { start('quick'); return; }
   if (e.target.id === 'wrongBtn') { start('wrong'); return; }
+  if (e.target.id === 'shareBtn') { shareCode(); return; }
   if (e.target.id === 'resumeBtn') { resume(); return; }
   if (e.target.id === 'discardBtn') { dropLS(LS_SESS(cur)); renderResume(); toast('已丢弃上次进度'); return; }
   const rc = e.target.closest('[data-ref]');
@@ -4070,6 +4146,10 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
+  if ($('#codeOv').classList.contains('show')) {
+    if (e.key === 'Escape') { closeCode(); e.preventDefault(); }
+    return;
+  }
   if ($('#refOv').classList.contains('show')) {
     if (e.key === 'Escape') { closeRef(); e.preventDefault(); }
     return;
@@ -4101,6 +4181,7 @@ migrateV1();
 initSel();
 if (!QB[cur]) cur = ORDER.find(k => QB[k]) || 'py';
 renderHome();
+
 
 </script>
 </body>
