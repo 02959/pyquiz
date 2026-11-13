@@ -268,6 +268,27 @@ pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
 .memrow .mid{font-family:"Cascadia Code",Consolas,monospace;color:#8a90a3;flex:none;width:58px}
 .memrow .mt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3f4559}
 .memrow i{font-style:normal;font-size:11px;color:#4338ca;background:#eef2ff;border-radius:999px;padding:0 6px}
+/* 改错题 */
+.badge.fix{background:#fee2e2;color:#991b1b}
+pre.fixcode{background:#131a2b;color:#e6e9f5;border-radius:12px;padding:12px 0;overflow:auto;font-size:12.8px;line-height:1.75;margin:0 0 12px;font-family:"Cascadia Code",Consolas,monospace}
+pre.fixcode .row{display:flex;gap:10px;padding:0 14px}
+pre.fixcode .row i{flex:none;width:26px;text-align:right;color:#6b7280;font-style:normal;user-select:none;font-size:12px}
+pre.fixcode .row b{font-weight:400;white-space:pre;color:#e6e9f5}
+pre.fixcode .row:nth-child(odd){background:rgba(255,255,255,.025)}
+.fixbox{border:1px solid #e2e5f0;border-radius:12px;padding:10px 12px;margin:10px 0;background:#fafbff}
+.fixrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.fixrow label{font-size:12.5px;color:#6b7280;flex:none}
+.fx-lines{width:120px;font-size:13px;padding:5px 8px;border:1px solid #dfe3ef;border-radius:8px;font-family:inherit;color:#1b2033}
+.fx-code{width:100%;min-height:62px;font-family:"Cascadia Code",Consolas,monospace;font-size:12.8px;padding:8px 10px;border:1px solid #dfe3ef;border-radius:8px;line-height:1.6;resize:vertical;background:#fff;color:#1b2033}
+.fx-code:focus,.fx-lines:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.fx-del{margin-left:auto;border:0;background:#fef2f2;color:#b91c1c;font-size:12px;border-radius:6px;padding:4px 8px;cursor:pointer;font-family:inherit}
+.fixmark{margin-top:8px;font-size:12.5px;font-weight:600}
+.fixmark.ok{color:#15803d}
+.fixmark.bad{color:#b91c1c}
+.fixmark.neutral{color:#8a90a3}
+.refbox{background:#fff;border:1px solid #e6e8f2;border-radius:10px;padding:10px 12px;margin:8px 0}
+.refhead{font-size:12.5px;font-weight:700;color:#3730a3;margin-bottom:6px}
+.refok{margin-left:8px;color:#15803d;font-weight:600}
 /* 详细讲解 */
 .detail{margin-top:10px;border-top:1px dashed #e2e5f0;padding-top:9px}
 .detail summary{cursor:pointer;font-size:12.5px;color:#4338ca;font-weight:600;list-style:none;outline:none}
@@ -3454,6 +3475,421 @@ window.QB.ref = {
   ]
 };
 
+/* ===== 改错题库：短 / 中 / 长 ===== */
+window.QB.fix = {
+  label: '改错题',
+  noScore: true,
+  hero: {
+    sub: '按代码长度分三档 · 找出错误的行并改写',
+    title: '给你一段有 bug 的程序，把它改对',
+    desc: '左边是行号。在框里填「要改的行号」和「替换后的代码」，可以新建多个框。提交后会逐个比对：行号和改法都对才算这一处改对。'
+  },
+  ch: {
+    "1": {
+      name: "短代码 · 10 行以内", short: "短码", range: "1–10 行",
+      points: ["每段 1–3 处错误，通常是单行能改好的", "考的是最常见的写法错误：方法用错括号、字符串和数字比、break/continue 用反"],
+      pit: "只改一半——比如把 str 改成 list 之后，下面的 int() 也得跟着改"
+    },
+    "2": {
+      name: "中等长度 · 11–30 行", short: "中码", range: "11–30 行",
+      points: ["3–6 处错误，往往要连带改相邻几行", "考类型混用、边界、索引、变量被覆盖"],
+      pit: "改一行能跑通，但结果仍然不对——要连着看数据怎么流的"
+    },
+    "3": {
+      name: "长代码 · 31 行以上", short: "长码", range: "31+ 行",
+      points: ["只看逻辑和循环，不纠结符号和用法细节", "典型：循环边界差一、变量在外层被重置、条件方向写反"],
+      pit: "盯着语法看半天，其实错在算法本身"
+    }
+  },
+  q: [
+    {
+      id: "fx01", ch: 1, topic: "方法用方括号调用", sec: "1 处", type: "fix",
+      code: `final = []
+for i in range(3):
+    final.append[f"{i+1}"]
+print(final)`,
+      answers: [
+        { lines: [3], code: `    final.append(f"{i+1}")`, why: "`append` 是列表的方法，只能用圆括号调用；方括号在 Python 里是下标/切片。写成 `append[...]` 会报 `TypeError: 'builtin_function_or_method' object is not subscriptable`。" }
+      ],
+      detail: "列表的所有方法（`append`/`extend`/`insert`/`remove`…）都是圆括号调用。另外注意 `append` 本身返回 `None`，写成 `x = lst.append(1)` 会把 `x` 变成 `None`。"
+    },
+    {
+      id: "fx02", ch: 1, topic: "把整个列表转成字符串再遍历", sec: "1 处", type: "fix",
+      code: `nums = [3, 12, 7]
+odd = []
+for ch in str(nums):
+    if int(ch) % 2 != 0:
+        odd.append(ch)
+print(odd)`,
+      answers: [
+        { lines: [3], code: `for ch in nums:`, why: "`str([3, 12, 7])` 得到的是 `\"[3, 12, 7]\"` 这个字符串，遍历它会拿到 `[`、`3`、`,`、空格、`1`、`2`……这些字符，而不是三个整数。" }
+      ],
+      detail: "想处理列表里的元素就直接遍历列表。`str(list)` 只适合打印，不适合再拆开。这种错误的表现是结果里混进 `[`、`,`、`.` 这些符号。"
+    },
+    {
+      id: "fx03", ch: 1, topic: "break 与 continue 用反", sec: "1 处", type: "fix",
+      code: `total = 0
+while True:
+    n = int(input())
+    if n < 0:
+        break
+    total += n
+    print(total)`,
+      answers: [
+        { lines: [5], code: `        continue`, why: "读到负数应该「跳过这个数，继续读下一个」，`break` 会直接跳出整个循环，后面输入的数全都不要了。只有读到结束标记（例如 0）才该 `break`。" }
+      ],
+      detail: "`break` = 整个循环结束；`continue` = 这一轮到此为止，回到条件判断。判断标准：**这个输入是不是让整个循环该收工了**。不是的话一律 `continue`。"
+    },
+    {
+      id: "fx04", ch: 1, topic: "三角形条件写反", sec: "1 处", type: "fix",
+      code: `a, b, c = 3, 4, 5
+if a + b >= c:
+    print("Invalid")
+else:
+    print("Valid")`,
+      answers: [
+        { lines: [2], code: `if a + b <= c or a + c <= b or b + c <= a:`, why: "三角形的充要条件是**任意两边之和大于第三边**；不成立就是「某一边 ≥ 另外两边之和」。原来既只判断了一条边，方向还写反了。" }
+      ],
+      detail: "写这种「三个条件任一满足」的判断，用 `or` 连三条，别偷懒只写一条。另外注意等号：`a + b == c` 时三点共线，也不是三角形，所以要用 `<=`。"
+    },
+    {
+      id: "fx05", ch: 1, topic: "f-string 漏了 f 前缀", sec: "1 处", type: "fix",
+      code: `bmi = 22.345
+print("BMI = ", "{bmi:.2f}")`,
+      answers: [
+        { lines: [2], code: `print(f"BMI = {bmi:.2f}")`, why: "第二个字符串没有 `f` 前缀，`{bmi:.2f}` 会被当成普通文字原样打印出来，变量根本没被替换。" }
+      ],
+      detail: "带 `{}` 的字符串前面必须有 `f`。另外 `print` 用逗号分隔会多插一个空格，所以格式化和文字最好放进同一个 f-string 里。"
+    },
+    {
+      id: "fx06", ch: 1, topic: "字典键是字符串却用整数查", sec: "1 处", type: "fix",
+      code: `days = {"1": 31, "2": 28, "3": 31}
+m = int(input())
+print(days[m])`,
+      answers: [
+        { lines: [3], code: `print(days[str(m)])`, why: "字典的键是字符串 `\"1\"`，用整数 `1` 去查会直接 `KeyError`。Python 里 `1 == \"1\"` 是 `False`，类型不同就是两个键。" }
+      ],
+      detail: "从 `input()` 拿到的永远是字符串；如果你用 `int()` 转了一道，查字典时就得转回去，或者干脆别转。**存和取的类型必须一致**，这是字符串字典最常见的坑。"
+    },
+    {
+      id: "fx07", ch: 1, topic: "[[0]*m]*n 的别名陷阱", sec: "1 处", type: "fix",
+      code: `n, m = 3, 4
+grid = [[0] * m] * n
+grid[0][0] = 1
+print(grid)`,
+      answers: [
+        { lines: [2], code: `grid = [[0] * m for _ in range(n)]`, why: "`[[0]*m]*n` 是把**同一个内层列表的引用**复制 n 份，改 `grid[0][0]` 时每一行都会跟着变。用推导式才能为每一行新建一个独立列表。" }
+      ],
+      detail: "判断能不能用 `*` 复制：元素是**不可变**的（数字、字符串、元组）就安全，是**可变**的（列表、字典）就会共享。二维数组一律用 `[[0]*m for _ in range(n)]`。"
+    },
+    {
+      id: "fx08", ch: 1, topic: "标志位用反", sec: "1 处", type: "fix",
+      code: `n = 12
+ok = True
+for i in range(2, n):
+    if n % i == 0:
+        ok = False
+print("No" if ok else "Yes")`,
+      answers: [
+        { lines: [6], code: `print("No" if not ok else "Yes")`, why: "`ok` 表示的是「还没找到因子」，找到因子就置 `False`。所以 ok 为真才输出 Yes，这里正好写反了。" }
+      ],
+      detail: "用标志位时先在纸上写一句「这个变量为 True 代表什么」。另外 n=1、n=0 要单独特判，不然 `range(2, n)` 是空的，会直接判成素数。"
+    },
+    {
+      id: "fx09", ch: 1, topic: "input 返回字符串却和整数比较", sec: "1 处", type: "fix",
+      code: `ans = input().strip()
+if ans == 3:
+    print("对")
+else:
+    print("错")`,
+      answers: [
+        { lines: [2], code: `if int(ans) == 3:`, why: "`input()` 返回的是字符串，`\"3\" == 3` 永远是 `False`，所以怎么输都走 else。要么转成整数再比，要么把右边写成 `\"3\"`。" }
+      ],
+      detail: "判断「字符串和数字比较」这类错误，最直接的办法是 `print(type(ans))`。只要两边类型不同，`==` 一定是 False，而且**不会报错**，所以最难查。"
+    },
+    {
+      id: "fx10", ch: 1, topic: "把一串数字当整数拆位", sec: "2 处", type: "fix",
+      code: `s = input()
+b = [0] * 10
+for ch in int(s):
+    b[ch] += 1
+print(b)`,
+      answers: [
+        { lines: [3], code: `for ch in s:`, why: "`int(s)` 把一个数变成一个整数，整数是不能被 for 遍历的，会报 `TypeError: 'int' object is not iterable`。要数每一位，应该遍历字符串本身。" },
+        { lines: [4], code: `    b[int(ch)] += 1`, why: "修完上一行后 `ch` 是字符 `'2'`，要当下标用必须转成整数。" }
+      ],
+      detail: "「统计数字出现次数」这类题，输入要当成**字符串**逐字符处理，不能先 `int()`。反过来，如果题目要求去掉前导零、当数值算，才需要转整数。"
+    },
+
+    {
+      id: "fx11", ch: 2, topic: "Decimal 被 int() 截断 + 初始值类型", sec: "2 处", type: "fix",
+      code: `from decimal import Decimal
+n = int(input())
+data = []
+for _ in range(n):
+    x = Decimal(input().strip())
+    data.append(int(x))
+best = 0
+idx = -1
+for i, x in enumerate(data):
+    if x > best:
+        best = x
+        idx = i
+print(idx + 1)`,
+      answers: [
+        { lines: [6], code: `    data.append(x)`, why: "`int(x)` 会把 Decimal 的小数部分直接砍掉，比如 0.357 变成 0。这一题要比较大小，必须保留原值。" },
+        { lines: [7], code: `best = Decimal("-1")`, why: "`best` 初始成整数 0，如果所有值都比 0 小（或都是 0），就找不到最大值，`idx` 一直是 -1。用同类型的极小值初始化更稳。" }
+      ],
+      detail: "Decimal 的题要「从一而终」：读入、计算、比较、初始化全部用 Decimal。中途混进 `int()` 或 `float()`，精度就丢了；而且 `float` 和 `Decimal` 比较经常不等（`Decimal(\"0.1\") == 0.1` 是 False）。"
+    },
+    {
+      id: "fx12", ch: 2, topic: "二维前缀和的 0/1 索引", sec: "1 处", type: "fix",
+      code: `n, m = map(int, input().split())
+grid = [list(map(int, input().split())) for _ in range(n)]
+pre = [[0] * (m + 1) for _ in range(n + 1)]
+for i in range(1, n + 1):
+    for j in range(1, m + 1):
+        pre[i][j] = grid[i][j] + pre[i-1][j] + pre[i][j-1] - pre[i-1][j-1]
+q = int(input())
+out = []
+for _ in range(q):
+    x1, y1, x2, y2 = map(int, input().split())
+    s = pre[x2][y2] - pre[x1-1][y2] - pre[x2][y1-1] + pre[x1-1][y1-1]
+    out.append(str(s))
+print("\\n".join(out))`,
+      answers: [
+        { lines: [6], code: `        pre[i][j] = grid[i-1][j-1] + pre[i-1][j] + pre[i][j-1] - pre[i-1][j-1]`, why: "`pre` 是 1 索引（多开了一行一列当哨兵），但 `grid` 是 0 索引。`i` 从 1 走到 n，`grid[i]` 在 `i == n` 时就越界了，应该用 `grid[i-1][j-1]`。" }
+      ],
+      detail: "前缀和最常见的两个坑：① 前缀和多开一圈 0，所以原数组下标要减 1；② 查询公式里四个角别写错，`pre[x2][y2] - pre[x1-1][y2] - pre[x2][y1-1] + pre[x1-1][y1-1]`。"
+    },
+    {
+      id: "fx13", ch: 2, topic: "猜对了没跳出循环", sec: "1 处", type: "fix",
+      code: `secret = 42
+low, high = 1, 100
+tries = 0
+while True:
+    guess = int(input())
+    tries += 1
+    if guess == secret:
+        print("right", tries)
+    if guess < secret:
+        low = guess
+    else:
+        high = guess`,
+      answers: [
+        { lines: [8], code: `        print("right", tries)
+        break`, why: "猜对之后打印了正确答案，但没有跳出 `while True`，程序会继续要输入。要在打印后面补一个 `break`。" }
+      ],
+      detail: "`while True` 这种写法，循环体里**必须**至少有一个能跳出去的 `break`，而且它要在正确的那条分支里。写完先问自己：什么情况下这个循环会结束？"
+    },
+    {
+      id: "fx14", ch: 2, topic: "累加器写进了外层循环", sec: "1 处", type: "fix",
+      code: `def check(i, j):
+    return (i + j) % 2 == 0
+
+n = int(input())
+total = 0
+for i in range(n):
+    total = 0
+    correct = 0
+    for j in range(4):
+        if check(i, j):
+            correct += 1
+    total += correct
+    print("第", i + 1, "组", correct, "个")
+print(total)`,
+      answers: [
+        { lines: [7], code: ``, why: "`total` 要跨所有轮累积，却在循环体里每轮被重置为 0，最后只剩最后一组的正确数。删掉循环里的这一行，只保留循环外开头的 `total = 0`。" }
+      ],
+      detail: "判断清零位置的标准：**这个计数是「每轮一个」还是「全程一个」**。每轮一个（比如本轮的 `correct`）→ 放循环体内；全程一个（比如 `total`）→ 放循环外。放错的表现就是「只算了最后一组」。"
+    },
+    {
+      id: "fx15", ch: 2, topic: "辗转相除的顺序写反", sec: "1 处", type: "fix",
+      code: `def gcd(a, b):
+    if a < b:
+        a, b = b, a
+    while b > 0:
+        a = b
+        b = a % b
+    return a
+
+n = int(input())
+for _ in range(n):
+    x, y = map(int, input().split())
+    print(x, y, gcd(x, y))`,
+      answers: [
+        { lines: [5, 6], code: `        a, b = b, a % b`, why: "先 `a = b` 就把原来的 `a` 覆盖了，下一行 `a % b` 算的是新的 `a`，等于 `b % b = 0`，循环立刻结束，结果永远是 b。必须**先算余数再赋值**，或者用元组一次性交换。" }
+      ],
+      detail: "交换/更新两个互相依赖的变量时，要么用 `a, b = b, a % b` 这种元组赋值（右边先算完），要么先用临时变量存一个。一句话：**等号右边全部算完，才轮到左边**。"
+    },
+    {
+      id: "fx16", ch: 2, topic: "循环边界差一", sec: "1 处", type: "fix",
+      code: `n = int(input())
+nums = list(map(int, input().split()))
+total = 0
+for i in range(1, n):
+    total += nums[i]
+avg = total / n
+print(round(avg, 2))
+cnt = 0
+for x in nums:
+    if x >= avg:
+        cnt += 1
+print("高于平均", cnt)`,
+      answers: [
+        { lines: [4], code: `for i in range(n):`, why: "`range(1, n)` 从下标 1 开始，漏掉了 `nums[0]`，总和少加一个数，平均数自然偏小。汇总要遍历全部元素时用 `range(n)` 或直接 `for x in nums`。" }
+      ],
+      detail: "`range(a, b)` 是**含头不含尾**。做汇总/统计时优先写 `for x in nums`，根本不给下标出错的机会；只有需要下标（比如同时要位置）时才用 `range(len(nums))`。"
+    },
+    {
+      id: "fx17", ch: 2, topic: "输出格式：直接打印列表", sec: "1 处", type: "fix",
+      code: `n = int(input())
+nums = list(map(int, input().split()))
+uniq = sorted(set(nums))
+print(nums)
+print("原始", len(nums), "个")
+print("去重后", len(uniq), "个")
+s = 0
+for x in uniq:
+    s += x
+print("和", s)
+print("平均", round(s / len(uniq), 2))`,
+      answers: [
+        { lines: [4], code: `print(" ".join(map(str, uniq)))`, why: "直接 `print(list)` 会连方括号和逗号一起输出 `[1, 2, 3]`，判题机要的是空格分隔的 `1 2 3`。用 `join` 把元素转成字符串再拼起来。" }
+      ],
+      detail: "OJ 的输出要求几乎都是「空格分隔、行末不能多空格」。`print(*nums)` 能去括号但默认用空格分隔，也行；`end=\" \"` 会留行末空格，严格的 OJ 会判格式错误。"
+    },
+
+    {
+      id: "fx18", ch: 3, topic: "长程序：循环里重置了累加器", sec: "1 处", type: "fix",
+      code: `n = int(input())
+scores = []
+for _ in range(n):
+    line = input().split()
+    name = line[0]
+    score = int(line[1])
+    scores.append((name, score))
+
+best = 0
+best_name = ""
+total = 0
+for name, score in scores:
+    total = 0
+    total += score
+    if score > best:
+        best = score
+        best_name = name
+
+print("平均分", round(total / n, 2))
+print("最高", best_name, best)
+
+passed = 0
+for name, score in scores:
+    if score >= 60:
+        passed += 1
+print("及格人数", passed)
+
+ranked = sorted(scores, key=lambda x: x[1], reverse=True)
+for i in range(len(ranked)):
+    print(i + 1, ranked[i][0], ranked[i][1])
+print("总人数", len(scores))
+print("结束")`,
+      answers: [
+        { lines: [13], code: ``, why: "`total = 0` 写在了循环体里面，每读一个分数就被清零一次，最后 `total` 只剩最后一个学生的分数，平均分自然全错。删掉这一行，保留循环外开头的 `total = 0`。" }
+      ],
+      detail: "这是最典型的一类 bug：**累加/计数变量放错层级**。判断方法——这个变量要跨越整轮循环累积，就必须在循环外初始化；只服务单轮，才放在循环里。更省事的写法：`total = sum(s for _, s in scores)`，根本不给放错的机会。"
+    },
+    {
+      id: "fx19", ch: 3, topic: "长程序：嵌套循环变量重名", sec: "1 处", type: "fix",
+      code: `def make_grid(n):
+    g = []
+    for _ in range(n):
+        g.append(list(map(int, input().split())))
+    return g
+
+
+def row_sums(g, n):
+    res = []
+    for i in range(n):
+        s = 0
+        for i in range(n):
+            s += g[i][j]
+        res.append(s)
+    return res
+
+
+def col_max(g, n):
+    res = []
+    for j in range(n):
+        m = -10 ** 9
+        for k in range(n):
+            if g[k][j] > m:
+                m = g[k][j]
+        res.append(m)
+    return res
+
+
+n = int(input())
+grid = make_grid(n)
+rs = row_sums(grid, n)
+cm = col_max(grid, n)
+
+ans = 0
+for i in range(n):
+    for j in range(n):
+        if grid[i][j] == rs[i] and grid[i][j] == cm[j]:
+            ans += 1
+print(ans)`,
+      answers: [
+        { lines: [12, 13], code: `        for j in range(n):
+            s += g[i][j]`, why: "内层循环又用了 `i`，把外层的 `i` 覆盖掉；同时 `g[i][j]` 里的 `j` 此时还没定义（会 NameError）。内层必须换个变量名，比如 `j`。" }
+      ],
+      detail: "嵌套循环的循环变量必须不同名。这类 bug 不报错时最难受——结果「看着有点对」。排查办法：循环里 `print(i, j)` 打一行，立刻看出变量被谁改了。"
+    },
+    {
+      id: "fx20", ch: 3, topic: "长程序：边遍历边删字典", sec: "1 处", type: "fix",
+      code: `def read_text():
+    return input()
+
+
+def count_chars(text):
+    freq = {}
+    for ch in text:
+        if ch.isalpha():
+            freq[ch] = freq.get(ch, 0) + 1
+    return freq
+
+
+def drop_rare(freq):
+    for ch in freq:
+        if freq[ch] < 2:
+            del freq[ch]
+    return freq
+
+
+def top(items, k):
+    items = sorted(items, key=lambda x: (-x[1], x[0]))
+    return items[:k]
+
+
+def render(items):
+    out = []
+    for ch, cnt in items:
+        out.append(ch + ":" + str(cnt))
+    return " ".join(out)
+
+
+text = read_text()
+freq = drop_rare(count_chars(text))
+print(render(top(freq.items(), 3)))`,
+      answers: [
+        { lines: [14], code: `    for ch in list(freq):`, why: "边遍历字典边 `del` 会抛 `RuntimeError: dictionary changed size during iteration`。要删就先拿一份键的快照 `list(freq)` 再遍历。" }
+      ],
+      detail: "字典遍历时**改值安全、增删键会崩**。两个正解：① `for k in list(d)` 遍历快照；② 用字典推导式重建一份 `freq = {k: v for k, v in freq.items() if v >= 2}`，后者更干净。"
+    }
+  ]
+};
+
 </script>
 <script>
 
@@ -3572,7 +4008,7 @@ function migrateV1() {
 let cur = 'py';
 let st = null;
 const SELS = {};
-const ORDER = ['py', 'c', 'ref'];
+const ORDER = ['py', 'c', 'fix', 'ref'];
 
 const B = () => QB[cur].q;
 const C = () => QB[cur].ch;
@@ -3635,6 +4071,10 @@ function storageOK() {
   catch (e) { return false; }
 }
 function pctColor(p) { return p >= 85 ? '#16a34a' : p >= 60 ? '#f59e0b' : '#dc2626'; }
+function fmtNum(n) {
+  const v = Math.round(Number(n) * 10) / 10;
+  return Number.isInteger(v) ? String(v) : v.toFixed(1);
+}
 
 /* 把纯文本解析渲染成段落 / 列表（支持 `code`、以 "- " 开头的要点） */
 function rich(s) {
@@ -3740,6 +4180,7 @@ function renderLast() {
   const el = $('#laststat');
   if (!el) return;
   if (!l) { el.textContent = '还没有记录，做完一次就会显示薄弱点'; return; }
+  if (QB[cur].noScore) { el.textContent = '上次看了 ' + l.total + ' 题'; return; }
   const d = new Date(l.ts);
   const hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   el.textContent = `上次：${l.right}/${l.total}（${l.pct}%）· ${d.getMonth() + 1}月${d.getDate()}日 ${hm}`;
@@ -3766,7 +4207,7 @@ function updateStart() {
   $('#quickBtn').disabled = !n;
   const w = wrongPool().filter(q => sel().has(q.ch)).length;
   const wb = $('#wrongBtn');
-  wb.disabled = !w;
+  if (QB[cur].noScore) { wb.style.display = 'none'; } else { wb.style.display = ''; wb.disabled = !w; }
   wb.textContent = w ? `只练错题 · ${w}` : '只练错题';
   renderResume();
   const sb = $('#shareBtn');
@@ -3780,7 +4221,7 @@ function renderResume() {
   if (!s) { bar.classList.add('hide'); return; }
   bar.classList.remove('hide');
   $('#rb-pos').textContent = (s.res.length + 1) + ' / ' + s.pool.length;
-  $('#rb-ok').textContent = s.res.reduce((a, r) => a + (r.score || 0), 0);
+  $('#rb-ok').textContent = fmtNum(s.res.reduce((a, r) => a + (r.score || 0), 0));
 }
 
 /* ---------- 我的题库面板 ---------- */
@@ -3875,6 +4316,8 @@ function partHtml(p, pi, q) {
 }
 
 function renderQ() {
+  const q0 = st.pool[st.i];
+  if (q0 && q0.type === 'fix') { renderFixQ(q0); return; }
   const q = st.pool[st.i], c = C()[q.ch];
   st.answered = false; st.picks = {}; st.texts = {};
   const pct = Math.round(st.i / st.pool.length * 100);
@@ -4015,6 +4458,16 @@ function next() {
 
 /* ---------- 交卷 ---------- */
 function finish() {
+  if (QB[cur].noScore) {
+    const n = st.res.length;
+    dropLS(LS_SESS(cur));
+    writeLS(LS_LAST(cur), { ts: Date.now(), total: n, right: n, pct: 100, secs: 0, ch: {}, wrong: [] });
+    $('#ov').classList.remove('show');
+    st = null;
+    goHome();
+    toast('本轮看了 ' + n + ' 题，参考答案在每题提交后显示');
+    return;
+  }
   const secs = Math.round((Date.now() - st.t0) / 1000);
   const total = st.res.length;
   const right = st.res.reduce((a, r) => a + r.score, 0);
@@ -4106,7 +4559,7 @@ function renderResult(bank, res, secs) {
       <div class="ring" style="--p:${pct};--c:${pctColor(pct)}"><div class="ring-in"><b>${pct}</b><span>%</span></div></div>
       <div>
         <h2>${verdict}</h2>
-        <p>答对 <b>${Math.round(right * 10) / 10}</b> / ${total} 题　·　用时 ${mm} 分 ${String(ss).padStart(2, '0')} 秒</p>
+        <p>答对 <b>${fmtNum(right)}</b> / ${total} 题　·　用时 ${mm} 分 ${String(ss).padStart(2, '0')} 秒</p>
         <p class="muted">${weakest ? `最需要补：第 ${weakest.n} 章 ${esc(chs[weakest.n].name)}（${Math.round(weakest.rate * 100)}%）` : '每章都覆盖到了'}</p>
       </div>
     </div>
@@ -4214,7 +4667,7 @@ function exportMd() {
   const d = new Date();
   const L = [`# ${b.label} 测评报告`, ` `,
     `- 时间：${d.toLocaleString('zh-CN')}`,
-    `- 成绩：${Math.round(right * 10) / 10} / ${total}（${total ? Math.round(right / total * 100) : 0}%）`, ` `,
+    `- 成绩：${fmtNum(right)} / ${total}（${total ? Math.round(right / total * 100) : 0}%）`, ` `,
     `## 错题与考点`];
   const wrong = st.res.filter(r => r.score < 1);
   if (!wrong.length) L.push('全部答对。');
@@ -4364,6 +4817,147 @@ seedMem();
 if (!QB[cur]) cur = ORDER.find(k => QB[k]) || 'py';
 renderHome();
 
+
+
+
+</script>
+<script>
+/* ============================================================
+   改错题（type: "fix"）
+   数据格式：
+   { id, ch, topic, sec, type:"fix", q?, code,
+     answers:[ { lines:[3] 或 [3,4], code:"替换后的代码", why:"思路" } ],
+     detail: "整段思路 / 更优写法" }
+   ============================================================ */
+const normCode = s => String(s || '').split('\n')
+  .map(l => l.replace(/[ \t]+/g, ' ').trim())
+  .filter(l => l).join('\n');
+
+function parseRange(s) {
+  const out = new Set();
+  String(s || '').replace(/[，、,;；]/g, ' ').split(/\s+/).filter(Boolean).forEach(part => {
+    const m = part.match(/^(\d+)(?:[-~—](\d+))?$/);
+    if (!m) return;
+    const a = +m[1], b = m[2] ? +m[2] : a;
+    for (let k = Math.min(a, b); k <= Math.max(a, b); k++) out.add(k);
+  });
+  return [...out].sort((x, y) => x - y);
+}
+function sameRange(a, b) {
+  const x = parseRange(a), y = Array.isArray(b) ? b.slice().sort((p, q) => p - q) : parseRange(b);
+  return x.length === y.length && x.every((v, i) => v === y[i]);
+}
+
+function renderFixQ(q) {
+  st.answered = false;
+  st.fix = [{ lines: '', code: '' }];
+  const pct = Math.round(st.i / st.pool.length * 100);
+  const ch = C()[q.ch];
+  const lines = String(q.code).replace(/\s+$/, '').split('\n');
+  const codeHtml = lines.map((l, i) =>
+    `<span class="row"><i>${i + 1}</i><b>${esc(l) || ' '}</b></span>`).join('');
+
+  $('#modal').innerHTML = `
+    <div class="m-head">
+      <div class="m-crumb"><b>第 ${st.i + 1} / ${st.pool.length} 题</b><span>·</span><span>Ch ${q.ch} ${esc(ch.short)}</span></div>
+      <button class="x" id="quit" title="退出（Esc）">✕</button>
+    </div>
+    <div class="pbar"><i style="width:${pct}%"></i></div>
+    <div class="m-body">
+      <div class="qmeta">
+        <span class="badge fix">改错题</span>
+        <span class="topic">${esc(q.topic)}</span>
+        ${q.sec ? `<span class="ver">${esc(q.sec)}</span>` : ''}
+      </div>
+      <p class="qtext">${fmt(q.q || '下面的程序有问题。找出错误的行，写出改正后的代码（可以整段替换若干行）。')}</p>
+      <pre class="fixcode">${codeHtml}</pre>
+      <div id="boxes"></div>
+      <button class="btn ghost small" id="addBox">＋ 新建修改框</button>
+      <div id="fb"></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn subtle" id="skip">直接看答案</button>
+      <button class="btn primary" id="submit">提交修改</button>
+    </div>`;
+
+  renderBoxes();
+  $('#addBox').addEventListener('click', () => { st.fix.push({ lines: '', code: '' }); renderBoxes(); });
+  $('#submit').addEventListener('click', () => st.answered ? next() : gradeFix(false));
+  $('#skip').addEventListener('click', () => st.answered ? next() : gradeFix(true));
+  $('#quit').addEventListener('click', quit);
+  $('#modal').scrollTop = 0;
+}
+
+function renderBoxes() {
+  const wrap = $('#boxes');
+  if (!wrap) return;
+  wrap.innerHTML = st.fix.map((b, i) => `
+    <div class="fixbox" data-i="${i}">
+      <div class="fixrow">
+        <label>要改的行号</label>
+        <input class="fx-lines" data-i="${i}" value="${esc(b.lines)}" placeholder="如 3 或 3-5">
+        ${st.fix.length > 1 ? `<button class="fx-del" data-i="${i}">删除</button>` : ''}
+      </div>
+      <textarea class="fx-code" data-i="${i}" placeholder="替换这几行的代码（可以是多行）">${esc(b.code)}</textarea>
+    </div>`).join('');
+  $$('#boxes .fx-lines').forEach(el => el.addEventListener('input', () => { st.fix[+el.dataset.i].lines = el.value; }));
+  $$('#boxes .fx-code').forEach(el => el.addEventListener('input', () => { st.fix[+el.dataset.i].code = el.value; }));
+  $$('#boxes .fx-del').forEach(el => el.addEventListener('click', () => { st.fix.splice(+el.dataset.i, 1); renderBoxes(); }));
+}
+
+function fixMatch(q, boxes) {
+  return q.answers.map(a => boxes.some(b => sameRange(b.lines, a.lines) && normCode(b.code) === normCode(a.code)));
+}
+
+function gradeFix(skip) {
+  const q = st.pool[st.i];
+  const boxes = st.fix.map(b => ({ lines: b.lines, code: b.code }));
+  if (!skip && !boxes.some(b => String(b.lines).trim() || String(b.code).trim())) {
+    toast('先写一条修改，或点「我不会」');
+    return;
+  }
+  const m = skip ? q.answers.map(() => false) : fixMatch(q, boxes);
+  const results = q.answers.map((a, i) => ({ ref: a, hit: m[i] }));
+  st.res.push({ q, score: 0, noscore: true, skip, given: '', parts: [] });
+  st.answered = true;
+  saveSession();
+  paintFix(q, results, boxes, skip);
+}
+
+function paintFix(q, results, boxes, skip) {
+  // 每个框：只有和参考答案完全一致时才标记
+  $$('#boxes .fixbox').forEach((boxEl, i) => {
+    const b = boxes[i];
+    const hit = q.answers.some(a => sameRange(b.lines, a.lines) && normCode(b.code) === normCode(a.code));
+    if (hit) {
+      const tip = document.createElement('div');
+      tip.className = 'fixmark ok';
+      tip.textContent = '✓ 与参考答案一致';
+      boxEl.appendChild(tip);
+    }
+    boxEl.querySelectorAll('input,textarea').forEach(el => { el.disabled = true; });
+  });
+
+  const refsHtml = q.answers.map((a, i) => `
+    <div class="refbox">
+      <div class="refhead">参考答案 ${i + 1} · 第 ${a.lines.join(',')} 行${results[i].hit ? '<span class="refok">你改对了</span>' : ''}</div>
+      <pre class="code sm"><code>${esc(a.code || '（删除这几行）')}</code></pre>
+      <div class="fb-why">${fmt(a.why || '')}</div>
+    </div>`).join('');
+
+  $('#fb').innerHTML = `
+    <div class="fb neutral">
+      <div class="fb-h">参考答案</div>
+      <div class="refs">${refsHtml}</div>
+      ${q.detail ? `<div class="dbody" style="margin-top:12px">${rich(q.detail)}</div>` : ''}
+      ${q.sec ? `<div class="fb-src">${esc(q.sec)}</div>` : ''}
+    </div>`;
+
+  $('#skip').style.display = 'none';
+  $('#submit').textContent = st.i === st.pool.length - 1 ? '完成 →' : '下一题 →';
+  const body = $('#modal .m-body');
+  if (body) body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+}
 
 </script>
 </body>
