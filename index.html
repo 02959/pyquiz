@@ -256,8 +256,8 @@ pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
 .codebox{height:132px;resize:vertical;line-height:1.7;white-space:pre-wrap;word-break:break-all;font-size:12.5px;color:#1b2033}
 #codeOv{background:rgba(23,27,45,.62)}
 /* 我的题库面板 */
-.memgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:760px){.memgrid{grid-template-columns:1fr}}
+.memgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.memgrid{grid-template-columns:1fr}}
 .memcol{background:#fafbff;border:1px solid #eef0f7;border-radius:12px;padding:12px 14px}
 .memh{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px}
 .memh span{margin-left:auto;font-size:12px;color:#8a90a3}
@@ -268,6 +268,8 @@ pre.code.sm{padding:10px 12px;font-size:12.3px;margin:8px 0}
 .memrow .mid{font-family:"Cascadia Code",Consolas,monospace;color:#8a90a3;flex:none;width:58px}
 .memrow .mt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#3f4559}
 .memrow i{font-style:normal;font-size:11px;color:#4338ca;background:#eef2ff;border-radius:999px;padding:0 6px}
+.favbtn{border:0;background:#f3f4f9;color:#8a90a3;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;flex:none;margin-right:6px}
+.favbtn:hover{background:#fef3c7;color:#b45309}
 /* 改错题 */
 .badge.fix{background:#fee2e2;color:#991b1b}
 pre.fixcode{background:#131a2b;color:#e6e9f5;border-radius:12px;padding:12px 0;overflow:auto;font-size:12.8px;line-height:1.75;margin:0 0 12px;font-family:"Cascadia Code",Consolas,monospace}
@@ -3995,6 +3997,38 @@ function skipIdsOf(bank) {
   return ids.filter(k => have.has(k));
 }
 
+/* ---------- 错题（跨场次累计） ---------- */
+const LS_WRONG = k => 'pyquiz.v4.wrong.' + k;
+function wrongSet() {
+  const a = readLS(LS_WRONG(cur));
+  return new Set(Array.isArray(a) ? a.filter(id => B().some(q => q.id === id)) : []);
+}
+function markWrong(id, isWrong) {
+  const w = wrongSet();
+  if (isWrong) w.add(id); else w.delete(id);
+  writeLS(LS_WRONG(cur), [...w]);
+}
+
+/* ---------- 收藏 ---------- */
+const LS_FAV = k => 'pyquiz.v4.fav.' + k;
+function favList() {
+  const a = readLS(LS_FAV(cur));
+  if (!Array.isArray(a)) return [];
+  const have = new Set(B().map(q => q.id));
+  return a.filter(id => have.has(id));
+}
+function isFav(id) { return favList().indexOf(id) >= 0; }
+function toggleFav(id) {
+  const a = favList();
+  const i = a.indexOf(id);
+  if (i >= 0) { a.splice(i, 1); toast('已取消收藏'); }
+  else { a.push(id); toast('已收藏，可在首页「我的题库」里找到'); }
+  writeLS(LS_FAV(cur), a);
+  const b = $('#fav');
+  if (b) b.textContent = isFav(id) ? '★' : '☆';
+  renderMem();
+}
+
 /* 把旧版的「最近一次成绩」换算成答对次数（只在上次做满全库时可用） */
 function seedMem() {
   const m = mem('py');
@@ -4044,8 +4078,7 @@ function initSel() {
 const sel = () => SELS[cur];
 function poolNow() { return B().filter(q => sel().has(q.ch) && !isDel(q.id)); }
 function wrongPool() {
-  const l = readLS(LS_LAST(cur));
-  const w = new Set((l && l.wrong) || []);
+  const w = wrongSet();
   return B().filter(q => w.has(q.id) && !isDel(q.id));
 }
 
@@ -4258,6 +4291,7 @@ function renderMem() {
   const m = mem();
   const sk = skipIdsOf();
   const del = m.del.filter(id => B().some(q => q.id === id));
+  const fav = favList();
   grid.innerHTML = `
     <div class="memcol">
       <div class="memh"><b>已掌握</b><span>${sk.length} 题</span></div>
@@ -4265,6 +4299,14 @@ function renderMem() {
       <div class="startrow" style="margin-top:8px">
         <button class="btn ghost small" id="toDel">移到「已删除」</button>
         <button class="btn subtle small" id="pracSkip">练一遍</button>
+      </div>
+    </div>
+    <div class="memcol">
+      <div class="memh"><b>⭐ 收藏</b><span>${fav.length} 题</span></div>
+      <div class="memlist">${fav.length ? fav.map(memRow).join('') : '<p class="muted" style="margin:6px 0">题卡右上角点 ☆ 就能收藏</p>'}</div>
+      <div class="startrow" style="margin-top:8px">
+        <button class="btn ghost small" id="unfav">取消收藏</button>
+        <button class="btn subtle small" id="pracFav">练这些</button>
       </div>
     </div>
     <div class="memcol">
@@ -4350,6 +4392,7 @@ function renderQ() {
   $('#modal').innerHTML = `
     <div class="m-head">
       <div class="m-crumb"><b>第 ${st.i + 1} / ${st.pool.length} 题</b><span>·</span><span>Ch ${q.ch} ${esc(c.short)}</span></div>
+      <button class="favbtn" id="fav" title="收藏此题">${isFav(q.id) ? '★' : '☆'}</button>
       <button class="x" id="quit" title="退出（Esc）">✕</button>
     </div>
     <div class="pbar"><i style="width:${pct}%"></i></div>
@@ -4367,20 +4410,23 @@ function renderQ() {
     </div>
     <div class="m-foot">
       <button class="btn subtle" id="skip">我不会</button>
+      <button class="btn ghost" id="prev"${st.i === 0 ? ' style="display:none"' : ''}>← 上一题</button>
       <button class="btn primary" id="submit">确认作答</button>
     </div>`;
-  bind();
+  bind(q);
   const first = $('#modal .ans');
   if (first) setTimeout(() => first.focus(), 60);
   $('#modal').scrollTop = 0;
 }
 
-function bind() {
+function bind(q) {
   $$('#modal .opt').forEach(el => el.addEventListener('click', () => pick(+el.dataset.part, +el.dataset.i)));
   $$('#modal .ans').forEach(el => el.addEventListener('input', () => el.classList.remove('wrong')));
   $('#submit').addEventListener('click', () => st.answered ? next() : grade(false));
   $('#skip').addEventListener('click', () => st.answered ? next() : grade(true));
   $('#quit').addEventListener('click', quit);
+  const fv = $('#fav'); if (fv) fv.addEventListener('click', () => toggleFav(q.id));
+  const pv = $('#prev'); if (pv) pv.addEventListener('click', () => goTo(st.i - 1));
   $$('#modal .refchip').forEach(el => el.addEventListener('click', () => openRef(el.dataset.ref)));
 }
 
@@ -4417,9 +4463,10 @@ function grade(skip) {
   const resp = parts.map((p, i) => skip ? { ok: false, given: '', resp: null } : gradePart(p, i));
   const score = skip ? 0 : resp.filter(r => r.ok).length / parts.length;
   const ok = score === 1;
-  st.res.push({ q, ok, score: skip ? 0 : (multi ? score : (ok ? 1 : 0)), skip, given: multi ? resp.map(r => r.given).join(' | ') : resp[0].given, parts: resp });
+  st.res.push({ q, ok, score: skip ? 0 : (multi ? score : (ok ? 1 : 0)), skip, given: multi ? resp.map(r => r.given).join(' | ') : resp[0].given, parts: resp, resp });
   st.answered = true;
   saveSession();
+  markWrong(q.id, !(ok && score === 1));
   const n = bump(q.id, ok && score === 1);
   if (ok && score === 1 && n === 2) setTimeout(() => toast('这题已答对 2 次，标记为「已掌握」'), 700);
   paint(q, resp, skip, score);
@@ -4475,8 +4522,34 @@ function paint(q, resp, skip, score) {
 }
 
 function next() {
-  if (st.i < st.pool.length - 1) { st.i++; renderQ(); }
-  else finish();
+  if (st.i < st.pool.length - 1) {
+    st.i++;
+    if (st.i < st.res.length) replay(st.i); else renderQ();
+  } else finish();
+}
+
+/* 跳到第 idx 题（已答过的用回放，未答的正常渲染） */
+function goTo(idx) {
+  if (!st || idx < 0 || idx >= st.pool.length) return;
+  st.i = idx;
+  if (idx < st.res.length) replay(idx); else renderQ();
+}
+function replay(idx) {
+  const r = st.res[idx];
+  if (!r) { renderQ(); return; }
+  if (r.q.type === 'fix') {
+    renderFixQ(r.q);
+    paintFix(r.q, r.fixResults || [], r.fixBoxes || [], r.skip);
+    st.answered = true;
+    return;
+  }
+  renderQ();
+  paint(r.q, r.resp || [], r.skip, r.score);
+  st.answered = true;
+  const sb = $('#submit');
+  if (sb) sb.textContent = idx === st.pool.length - 1 ? '查看测评报告 →' : '下一题 →';
+  const pv = $('#prev');
+  if (pv) pv.style.display = idx === 0 ? 'none' : '';
 }
 
 /* ---------- 交卷 ---------- */
@@ -4664,9 +4737,7 @@ function shareCode() {
 function closeCode() { $('#codeOv').classList.remove('show'); }
 
 function retryWrong() {
-  const l = readLS(LS_LAST(cur));
-  const w = new Set((l && l.wrong) || []);
-  const pool = B().filter(q => w.has(q.id));
+  const pool = wrongPool();
   if (!pool.length) { toast('没有错题'); return; }
   st = { bank: cur, pool, i: 0, res: [], t0: Date.now(), mode: 'wrong' };
   saveSession();
@@ -4780,7 +4851,7 @@ document.addEventListener('click', e => {
     return;
   }
   if (e.target.id === 'restoreDel') {
-    const ids = checkedMem(1);
+    const ids = checkedMem(2);
     if (!ids.length) { toast('先在「已删除」里勾选题目'); return; }
     const m = mem();
     m.del = m.del.filter(id => ids.indexOf(id) < 0);
@@ -4789,6 +4860,14 @@ document.addEventListener('click', e => {
     return;
   }
   if (e.target.id === 'pracSkip') { startIds(skipIdsOf(), 'skip'); return; }
+  if (e.target.id === 'pracFav') { startIds(favList(), 'fav'); return; }
+  if (e.target.id === 'unfav') {
+    const ids = checkedMem(1);
+    if (!ids.length) { toast('先在「收藏」里勾选题目'); return; }
+    const a = favList().filter(id => ids.indexOf(id) < 0);
+    writeLS(LS_FAV(cur), a); renderMem(); toast('已取消收藏 ' + ids.length + ' 题');
+    return;
+  }
   if (e.target.id === 'pracDel') { startIds(mem().del.slice(), 'review'); return; }
   if (e.target.id === 'allOn') { SELS[cur] = new Set(chKeys()); renderHome(); return; }
   if (e.target.id === 'allOff') { SELS[cur] = new Set(); renderHome(); return; }
@@ -4883,6 +4962,7 @@ function renderFixQ(q) {
   $('#modal').innerHTML = `
     <div class="m-head">
       <div class="m-crumb"><b>第 ${st.i + 1} / ${st.pool.length} 题</b><span>·</span><span>Ch ${q.ch} ${esc(ch.short)}</span></div>
+      <button class="favbtn" id="fav" title="收藏此题">${isFav(q.id) ? '★' : '☆'}</button>
       <button class="x" id="quit" title="退出（Esc）">✕</button>
     </div>
     <div class="pbar"><i style="width:${pct}%"></i></div>
@@ -4900,6 +4980,7 @@ function renderFixQ(q) {
     </div>
     <div class="m-foot">
       <button class="btn subtle" id="skip">直接看答案</button>
+      <button class="btn ghost" id="prev"${st.i === 0 ? ' style="display:none"' : ''}>← 上一题</button>
       <button class="btn primary" id="submit">提交修改</button>
     </div>`;
 
@@ -4908,6 +4989,8 @@ function renderFixQ(q) {
   $('#submit').addEventListener('click', () => st.answered ? next() : gradeFix(false));
   $('#skip').addEventListener('click', () => st.answered ? next() : gradeFix(true));
   $('#quit').addEventListener('click', quit);
+  const fv = $('#fav'); if (fv) fv.addEventListener('click', () => toggleFav(q.id));
+  const pv = $('#prev'); if (pv) pv.addEventListener('click', () => goTo(st.i - 1));
   $('#modal').scrollTop = 0;
 }
 
@@ -4941,7 +5024,7 @@ function gradeFix(skip) {
   }
   const m = skip ? q.answers.map(() => false) : fixMatch(q, boxes);
   const results = q.answers.map((a, i) => ({ ref: a, hit: m[i] }));
-  st.res.push({ q, score: 0, noscore: true, skip, given: '', parts: [] });
+  st.res.push({ q, score: 0, noscore: true, skip, given: '', parts: [], fixResults: results, fixBoxes: boxes });
   st.answered = true;
   saveSession();
   paintFix(q, results, boxes, skip);
